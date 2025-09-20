@@ -1,0 +1,56 @@
+﻿<UserControl x:Class="NetworkService.Views.MeasurementGraphView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:NetworkService.Views"
+             xmlns:conv="clr-namespace:NetworkService.Converters"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <conv:PointsConverter x:Key="PointsConverter"/>
+    </UserControl.Resources>
+
+    <Grid Background="White" Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Odabir entiteta -->
+        <StackPanel Orientation="Horizontal" Margin="10">
+            <TextBlock Text="Select Entity:" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,5,0"/>
+            <ComboBox Width="200"
+                      ItemsSource="{Binding Entities}"
+                      SelectedItem="{Binding SelectedEntity}"
+                      DisplayMemberPath="Name"/>
+        </StackPanel>
+
+        <!-- GLAVNI GRAF -->
+        <Canvas Grid.Row="1" Width="650" Height="300" Background="#FAFAFA" Margin="10">
+            <!-- Polyline koja spaja tacke -->
+            <Polyline Stroke="DarkBlue" StrokeThickness="2"
+                      Points="{Binding Measurements, Converter={StaticResource PointsConverter}}"/>
+
+            <!-- Kuglice -->
+            <ItemsControl ItemsSource="{Binding Measurements}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <Canvas />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Ellipse Width="8" Height="8" Fill="DarkBlue"
+                                 Canvas.Left="{Binding RelativeX}"
+                                 Canvas.Top="{Binding RelativeY}">
+                            <Ellipse.ToolTip>
+                                <TextBlock Text="{Binding Value}"/>
+                            </Ellipse.ToolTip>
+                        </Ellipse>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Canvas>
+    </Grid>
+</UserControl>

@@ -1,0 +1,57 @@
+﻿<Window x:Class="NetworkService.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="clr-namespace:NetworkService.ViewModel"
+        xmlns:v="clr-namespace:NetworkService.Views"
+        Title="Network Service" Width="900" Height="650">
+
+    <Window.DataContext>
+        <vm:MainWindowViewModel/>
+    </Window.DataContext>
+
+    <Window.Resources>
+        <DataTemplate DataType="{x:Type vm:EntitiesViewModel}">
+            <v:EntitiesView/>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type vm:DisplayViewModel}">
+            <v:DisplayView/>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type vm:MeasurementGraphViewModel}">
+            <v:MeasurementGraphView/>
+        </DataTemplate>
+    </Window.Resources>
+
+    <DockPanel LastChildFill="True">
+
+        <!-- MENI -->
+        <Menu DockPanel.Dock="Top" Background="LightGray">
+            <MenuItem Header="Entities" Command="{Binding NavCommand}" CommandParameter="entities"/>
+            <MenuItem Header="Network Display" Command="{Binding NavCommand}" CommandParameter="display"/>
+            <MenuItem Header="Measurement Graph" Command="{Binding NavCommand}" CommandParameter="graph"/>
+        </Menu>
+
+        <!-- STATUS BAR (uvek na dnu) -->
+        <DockPanel DockPanel.Dock="Bottom" Background="LightGray" Height="28">
+            <TextBlock Text="Status: " Margin="5,0,0,0" VerticalAlignment="Center"/>
+            <TextBlock Text="{Binding StatusBarMessage}" VerticalAlignment="Center"/>
+        </DockPanel>
+
+        <!-- TERMINAL (iznad status bara, full širina) -->
+        <Grid DockPanel.Dock="Bottom" Background="Black" Height="120">
+            <TextBox Text="{Binding TerminalInput, UpdateSourceTrigger=PropertyChanged}"
+                     AcceptsReturn="True"
+                     VerticalScrollBarVisibility="Auto"
+                     Foreground="LightGreen"
+                     Background="Black"
+                     FontFamily="Consolas"
+                     FontSize="13"
+                     TextWrapping="Wrap"/>
+        </Grid>
+
+        <!-- CENTRALNI SADRŽAJ -->
+        <ContentControl Content="{Binding CurrentViewModel}" />
+
+    </DockPanel>
+</Window>
