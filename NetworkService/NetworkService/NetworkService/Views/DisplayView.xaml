@@ -4,6 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:NetworkService.Views"
+             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+             xmlns:model="clr-namespace:NetworkService.Model"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid Background="#F8F8F8">
@@ -12,53 +14,120 @@
             <ColumnDefinition Width="4*"/>
         </Grid.ColumnDefinitions>
 
-        <!-- LEVA STRANA: TreeView sa grupisanim entitetima -->
+        <!-- LEVA STRANA: TreeView -->
         <StackPanel Grid.Column="0" Margin="10">
             <TextBlock Text="Entities" FontWeight="Bold" FontSize="14" Margin="0,0,0,10"/>
 
-            <TreeView>
-                <TreeViewItem Header="Solar Panels" IsExpanded="True">
-                    <ItemsControl ItemsSource="{Binding SolarEntities}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding Name}"/>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </TreeViewItem>
+            <TreeView AllowDrop="True" ItemsSource="{Binding EntityGroups}">
+                <i:Interaction.Triggers>
+                    <i:EventTrigger EventName="Drop">
+                        <i:InvokeCommandAction Command="{Binding TreeViewDropCommand}" PassEventArgsToCommand="True"/>
+                    </i:EventTrigger>
+                </i:Interaction.Triggers>
 
-                <TreeViewItem Header="Wind Generators" IsExpanded="True">
-                    <ItemsControl ItemsSource="{Binding WindEntities}">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding Name}"/>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </TreeViewItem>
+                <TreeView.Resources>
+                    <HierarchicalDataTemplate DataType="{x:Type model:EntityGroup}" ItemsSource="{Binding Entities}">
+                        <TextBlock FontWeight="Bold" Text="{Binding GroupName}"/>
+                    </HierarchicalDataTemplate>
+
+                    <DataTemplate DataType="{x:Type model:Entity}">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Width="20" Height="20" Source="{Binding Type.ImagePath}" Margin="0,0,5,0"/>
+                            <TextBlock Text="{Binding Name}" VerticalAlignment="Center"/>
+
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="MouseLeftButtonDown">
+                                    <i:InvokeCommandAction Command="{Binding DataContext.MouseDownCommand,
+                           RelativeSource={RelativeSource AncestorType=UserControl}}"
+                           CommandParameter="{Binding}"/>
+                                </i:EventTrigger>
+                                <i:EventTrigger EventName="MouseLeftButtonUp">
+                                    <i:InvokeCommandAction Command="{Binding DataContext.MouseUpCommand,
+                           RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+                        </StackPanel>
+                    </DataTemplate>
+                </TreeView.Resources>
             </TreeView>
         </StackPanel>
 
-        <!-- DESNA STRANA: GRID sa entitetima -->
-        <WrapPanel Grid.Column="1" Margin="10" Background="#EEEEEE">
-            <ItemsControl ItemsSource="{Binding Entities}">
+        <!-- DESNA STRANA: Slotovi u Canvasu -->
+        <Grid Grid.Column="1" Margin="10">
+            <ItemsControl ItemsSource="{Binding CanvasSlots}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <Grid Background="#EEEEEE">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                        </Grid>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+
+                <ItemsControl.ItemContainerStyle>
+                    <Style>
+                        <Setter Property="Grid.Row" Value="{Binding Row}"/>
+                        <Setter Property="Grid.Column" Value="{Binding Col}"/>
+                    </Style>
+                </ItemsControl.ItemContainerStyle>
+
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Border BorderThickness="1" BorderBrush="Gray" Margin="5" Padding="10" Background="White">
-                            <StackPanel>
-                                <TextBlock Text="{Binding Name}" FontWeight="Bold" HorizontalAlignment="Center"/>
-                                <TextBlock Text="{Binding Id}" FontStyle="Italic" FontSize="12" HorizontalAlignment="Center"/>
+                        <Border BorderBrush="Gray" BorderThickness="1" Margin="5">
+                            <Canvas Width="100" Height="100" AllowDrop="True" Background="AliceBlue">
+                                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    <!-- Slika -->
+                                    <Image Width="60" Height="60"
+                                           Source="{Binding CanvasEntity.Type.ImagePath}"/>
 
-                                <!-- OVDE JE SLIKA -->
-                                <Image Source="{Binding Type.ImagePath}" Width="50" Height="50" Margin="0,5" HorizontalAlignment="Center"/>
+                                    <!-- Ime -->
+                                    <TextBlock Text="{Binding CanvasEntity.Name}"
+                                               FontWeight="Bold"
+                                               HorizontalAlignment="Center"/>
 
-                                <TextBlock Text="{Binding Value}" Foreground="DarkBlue"
-                                           FontSize="14" HorizontalAlignment="Center"/>
-                            </StackPanel>
+                                    <!-- ID -->
+                                    <TextBlock Text="{Binding CanvasEntity.Id, StringFormat=ID: {0}}"
+                                               FontSize="12"
+                                               Foreground="Gray"
+                                               HorizontalAlignment="Center"/>
+
+                                    <!-- Poslednja vrednost -->
+                                    <TextBlock Text="{Binding CanvasEntity.Value, StringFormat=Value: {0}}"
+                                               FontSize="12"
+                                               Foreground="DarkBlue"
+                                               HorizontalAlignment="Center"/>
+                                </StackPanel>
+                                <i:Interaction.Triggers>
+                                    <i:EventTrigger EventName="Drop">
+                                        <i:InvokeCommandAction Command="{Binding DataContext.DropCommand,
+                                            RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                            PassEventArgsToCommand="True"/>
+                                    </i:EventTrigger>
+                                    <i:EventTrigger EventName="DragOver">
+                                        <i:InvokeCommandAction Command="{Binding DataContext.DragOverCommand,
+                                            RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                            PassEventArgsToCommand="True"/>
+                                    </i:EventTrigger>
+                                    <i:EventTrigger EventName="MouseLeftButtonDown">
+                                        <i:InvokeCommandAction Command="{Binding DataContext.MouseDownCommand,
+                                            RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                            CommandParameter="{Binding CanvasEntity}"/>
+                                    </i:EventTrigger>
+                                </i:Interaction.Triggers>
+                            </Canvas>
                         </Border>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
-        </WrapPanel>
+        </Grid>
     </Grid>
 </UserControl>
