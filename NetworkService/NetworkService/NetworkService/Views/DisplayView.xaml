@@ -57,73 +57,61 @@
             <ItemsControl ItemsSource="{Binding CanvasSlots}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <Grid Background="#EEEEEE">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="*"/>
-                                <RowDefinition Height="*"/>
-                                <RowDefinition Height="*"/>
-                            </Grid.RowDefinitions>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                        </Grid>
+                        <!-- 3x4 mreža slotova -->
+                        <UniformGrid Rows="3" Columns="4" Background="#EEEEEE"/>
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
 
-                <ItemsControl.ItemContainerStyle>
-                    <Style>
-                        <Setter Property="Grid.Row" Value="{Binding Row}"/>
-                        <Setter Property="Grid.Column" Value="{Binding Col}"/>
-                    </Style>
-                </ItemsControl.ItemContainerStyle>
-
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Border BorderBrush="Gray" BorderThickness="1" Margin="5">
-                            <Canvas Width="100" Height="100" AllowDrop="True" Background="AliceBlue">
-                                <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                                    <!-- Slika -->
-                                    <Image Width="60" Height="60"
-                                           Source="{Binding CanvasEntity.Type.ImagePath}"/>
+                        <!-- SLOT KONTEJNER -->
+                        <Border BorderBrush="Gray" BorderThickness="1" Margin="8" 
+                    Background="White" CornerRadius="4"
+                    Width="70" Height="70"
+                    VerticalAlignment="Center" HorizontalAlignment="Center"
+                    AllowDrop="True">
+                            <!-- OVO JE BITNO -->
 
-                                    <!-- Ime -->
-                                    <TextBlock Text="{Binding CanvasEntity.Name}"
-                                               FontWeight="Bold"
-                                               HorizontalAlignment="Center"/>
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <!-- Ikonica -->
+                                <Image Width="30" Height="30" 
+                           Source="{Binding CanvasEntity.Type.ImagePath}" 
+                           HorizontalAlignment="Center"/>
 
-                                    <!-- ID -->
-                                    <TextBlock Text="{Binding CanvasEntity.Id, StringFormat=ID: {0}}"
-                                               FontSize="12"
-                                               Foreground="Gray"
-                                               HorizontalAlignment="Center"/>
+                                <!-- ID -->
+                                <TextBlock Text="{Binding CanvasEntity.Id, StringFormat=ID: {0}}"
+                               FontSize="10" Foreground="Gray"
+                               HorizontalAlignment="Center"/>
 
-                                    <!-- Poslednja vrednost -->
-                                    <TextBlock Text="{Binding CanvasEntity.Value, StringFormat=Value: {0}}"
-                                               FontSize="12"
-                                               Foreground="DarkBlue"
-                                               HorizontalAlignment="Center"/>
-                                </StackPanel>
-                                <i:Interaction.Triggers>
-                                    <i:EventTrigger EventName="Drop">
-                                        <i:InvokeCommandAction Command="{Binding DataContext.DropCommand,
-                                            RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                                            PassEventArgsToCommand="True"/>
-                                    </i:EventTrigger>
-                                    <i:EventTrigger EventName="DragOver">
-                                        <i:InvokeCommandAction Command="{Binding DataContext.DragOverCommand,
-                                            RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                                            PassEventArgsToCommand="True"/>
-                                    </i:EventTrigger>
-                                    <i:EventTrigger EventName="MouseLeftButtonDown">
-                                        <i:InvokeCommandAction Command="{Binding DataContext.MouseDownCommand,
-                                            RelativeSource={RelativeSource AncestorType=ItemsControl}}"
-                                            CommandParameter="{Binding CanvasEntity}"/>
-                                    </i:EventTrigger>
-                                </i:Interaction.Triggers>
-                            </Canvas>
+                                <!-- Vrednost -->
+                                <TextBlock Text="{Binding CanvasEntity.Value, StringFormat=Val: {0}}"
+                               FontSize="10" Foreground="DarkBlue"
+                               HorizontalAlignment="Center"/>
+                            </StackPanel>
+
+                            <!-- Drag&Drop POVEZIVANJE -->
+                            <i:Interaction.Triggers>
+                                <i:EventTrigger EventName="Drop">
+                                    <i:InvokeCommandAction Command="{Binding DataContext.DropCommand,
+                                  RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                  PassEventArgsToCommand="True"/>
+                                </i:EventTrigger>
+                                <i:EventTrigger EventName="DragOver">
+                                    <i:InvokeCommandAction Command="{Binding DataContext.DragOverCommand,
+                                  RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                  PassEventArgsToCommand="True"/>
+                                </i:EventTrigger>
+                                <i:EventTrigger EventName="MouseLeftButtonDown">
+                                    <i:InvokeCommandAction Command="{Binding DataContext.MouseDownCommand,
+                                  RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                                  CommandParameter="{Binding CanvasEntity}"/>
+                                </i:EventTrigger>
+                                <i:EventTrigger EventName="MouseLeftButtonUp">
+                                    <i:InvokeCommandAction Command="{Binding DataContext.MouseUpCommand,
+                                  RelativeSource={RelativeSource AncestorType=ItemsControl}}"/>
+                                </i:EventTrigger>
+                            </i:Interaction.Triggers>
+
                         </Border>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
