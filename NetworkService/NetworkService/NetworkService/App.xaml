@@ -5,15 +5,15 @@
              StartupUri="MainWindow.xaml">
     <Application.Resources>
 
-        <!-- 🎨 Bazne boje -->
+        <!-- Base Colors -->
         <SolidColorBrush x:Key="PrimaryButtonColor" Color="#0066cc"/>
-        <SolidColorBrush x:Key="TextboxColor" Color="#bdebff"/>
-        <SolidColorBrush x:Key="ComboBoxColor" Color="#bdebff"/>
+        <SolidColorBrush x:Key="TextboxColor" Color="#EAF4FF"/>
+        <SolidColorBrush x:Key="ComboBoxColor" Color="#EAF4FF"/>
         <SolidColorBrush x:Key="HoverColor" Color="#005bb5"/>
         <SolidColorBrush x:Key="PressedColor" Color="#004a99"/>
         <SolidColorBrush x:Key="FocusedBorderColor" Color="#3399ff"/>
 
-        <!-- 🔹 Globalni Button Style -->
+        <!-- Global Button Style -->
         <Style TargetType="Button">
             <Setter Property="Background" Value="{StaticResource PrimaryButtonColor}"/>
             <Setter Property="Foreground" Value="White"/>
@@ -56,32 +56,39 @@
             </Setter>
         </Style>
 
-        <!-- 🔹 Globalni TextBox Style -->
+        <!-- Global TextBox Style -->
         <Style TargetType="TextBox">
             <Setter Property="Background" Value="{StaticResource TextboxColor}"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="BorderBrush" Value="Gray"/>
-            <Setter Property="Padding" Value="5"/>
+            <Setter Property="BorderThickness" Value="1.5"/>
+            <Setter Property="BorderBrush" Value="#3399ff"/>
+            <Setter Property="Padding" Value="6"/>
             <Setter Property="FontSize" Value="13"/>
             <Setter Property="SnapsToDevicePixels" Value="True"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="TextBox">
                         <Border x:Name="border"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="4">
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="6"
+                        SnapsToDevicePixels="True">
                             <ScrollViewer x:Name="PART_ContentHost"/>
                         </Border>
                         <ControlTemplate.Triggers>
-                            <!-- Fokus animacija -->
-                            <Trigger Property="IsKeyboardFocused" Value="True">
-                                <Setter TargetName="border" Property="BorderBrush" Value="{StaticResource FocusedBorderColor}"/>
+                            <!-- Hover effect -->
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="BorderBrush" Value="#66b3ff"/>
                                 <Setter TargetName="border" Property="BorderThickness" Value="2"/>
                             </Trigger>
+                            <!-- Focus animation -->
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="border" Property="BorderBrush" Value="#0066cc"/>
+                                <Setter TargetName="border" Property="BorderThickness" Value="2.5"/>
+                            </Trigger>
+                            <!-- Disabled -->
                             <Trigger Property="IsEnabled" Value="False">
-                                <Setter TargetName="border" Property="Opacity" Value="0.6"/>
+                                <Setter TargetName="border" Property="Opacity" Value="0.5"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -89,54 +96,62 @@
             </Setter>
         </Style>
 
-        <!-- 🔹 Globalni ComboBox Style -->
+        <!-- Global ComboBox Style -->
         <Style TargetType="ComboBox">
             <Setter Property="Background" Value="{StaticResource ComboBoxColor}"/>
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="BorderBrush" Value="Gray"/>
-            <Setter Property="Padding" Value="5"/>
+            <Setter Property="BorderThickness" Value="1.5"/>
+            <Setter Property="BorderBrush" Value="#3399ff"/>
+            <Setter Property="Padding" Value="6,2"/>
             <Setter Property="FontSize" Value="13"/>
+            <Setter Property="MinHeight" Value="30"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
             <Setter Property="SnapsToDevicePixels" Value="True"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="ComboBox">
                         <Grid>
-                            <!-- Okvir -->
+                            <!-- Border -->
                             <Border x:Name="border"
                             Background="{TemplateBinding Background}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="4">
+                            CornerRadius="6">
                                 <Grid>
-                                    <ContentPresenter Margin="5"
+                                    <!-- Selected Item -->
+                                    <ContentPresenter x:Name="contentPresenter"
+                                              Margin="6,0,30,0"
                                               VerticalAlignment="Center"
                                               HorizontalAlignment="Left"
                                               Content="{TemplateBinding SelectionBoxItem}"/>
-                                    <!-- Dugme strelica -->
+
+                                    <!-- Button Pointer -->
                                     <ToggleButton x:Name="DropDownToggle"
-                                          DockPanel.Dock="Right"
                                           Focusable="False"
                                           IsChecked="{Binding Path=IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"
-                                          Background="{TemplateBinding Background}"
+                                          Background="Transparent"
                                           BorderThickness="0"
                                           HorizontalAlignment="Right"
-                                          Width="25">
+                                          Width="25"
+                                          VerticalAlignment="Stretch">
                                         <Path Data="M 0 0 L 4 4 L 8 0 Z"
-                                      Fill="Black"
-                                      HorizontalAlignment="Center"
-                                      VerticalAlignment="Center"/>
+                                              Fill="#0066cc"
+                                              HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"/>
                                     </ToggleButton>
                                 </Grid>
                             </Border>
 
-                            <!-- Popup lista -->
+                            <!-- PopUp List -->
                             <Popup x:Name="PART_Popup"
                            Placement="Bottom"
                            IsOpen="{TemplateBinding IsDropDownOpen}"
                            AllowsTransparency="True"
                            Focusable="False"
                            PopupAnimation="Slide">
-                                <Border Background="White" BorderBrush="Gray" BorderThickness="1" CornerRadius="4">
+                                <Border Background="White" 
+                                BorderBrush="#3399ff"
+                                BorderThickness="1.5"
+                                CornerRadius="6">
                                     <ScrollViewer>
                                         <ItemsPresenter/>
                                     </ScrollViewer>
@@ -144,16 +159,21 @@
                             </Popup>
                         </Grid>
 
-                        <!-- Trigeri -->
+                        <!-- Triggers -->
                         <ControlTemplate.Triggers>
-                            <!-- Fokusirano -->
-                            <Trigger Property="IsKeyboardFocused" Value="True">
-                                <Setter TargetName="border" Property="BorderBrush" Value="{StaticResource FocusedBorderColor}"/>
+                            <!-- Hover -->
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="BorderBrush" Value="#66b3ff"/>
                                 <Setter TargetName="border" Property="BorderThickness" Value="2"/>
+                            </Trigger>
+                            <!-- Focused -->
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="border" Property="BorderBrush" Value="#0066cc"/>
+                                <Setter TargetName="border" Property="BorderThickness" Value="2.5"/>
                             </Trigger>
                             <!-- Disabled -->
                             <Trigger Property="IsEnabled" Value="False">
-                                <Setter TargetName="border" Property="Opacity" Value="0.6"/>
+                                <Setter TargetName="border" Property="Opacity" Value="0.5"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -161,7 +181,7 @@
             </Setter>
         </Style>
 
-        <!-- 🔹 Globalni DataGrid stil -->
+        <!-- Global DataGrid Style -->
         <Style TargetType="{x:Type DataGrid}">
             <Setter Property="RowHeight" Value="40"/>
             <Setter Property="ColumnHeaderHeight" Value="40"/>
@@ -183,7 +203,7 @@
                                 <Setter Property="Background" Value="#F5F5F5"/>
                             </Trigger>
                             <Trigger Property="IsSelected" Value="True">
-                                <Setter Property="Background" Value="#E0E0E0"/>
+                                <Setter Property="Background" Value="#E0EFFF"/>
                                 <Setter Property="FontWeight" Value="SemiBold"/>
                             </Trigger>
                         </Style.Triggers>
@@ -194,12 +214,13 @@
                 <Setter.Value>
                     <Style TargetType="DataGridColumnHeader">
                         <Setter Property="HorizontalContentAlignment" Value="Center"/>
-                        <Setter Property="FontWeight" Value="SemiBold"/>
-                        <Setter Property="FontSize" Value="13"/>
-                        <Setter Property="BorderThickness" Value="0,0,0,1"/>
-                        <Setter Property="BorderBrush" Value="#CCC"/>
-                        <Setter Property="Padding" Value="5"/>
-                        <Setter Property="Background" Value="#EEE"/>
+                        <Setter Property="FontWeight" Value="Bold"/>
+                        <Setter Property="FontSize" Value="12"/>
+                        <Setter Property="BorderThickness" Value="0,0,0,2"/>
+                        <Setter Property="BorderBrush" Value="#0066cc"/>
+                        <Setter Property="Padding" Value="6"/>
+                        <Setter Property="Background" Value="#0066cc"/>
+                        <Setter Property="Foreground" Value="White"/>
                     </Style>
                 </Setter.Value>
             </Setter>

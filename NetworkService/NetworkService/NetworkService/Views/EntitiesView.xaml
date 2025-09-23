@@ -7,26 +7,29 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
 
-    <Grid Background="#F0F0F0" Margin="10">
+    <Grid Background="#EAF4FF" 
+          Margin="10">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="2*" />
-            <ColumnDefinition Width="3*" />
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="3*"/>
         </Grid.ColumnDefinitions>
 
-        <!-- LEVI PANEL: Forma + Search -->
+        <!-- LEVI PANEL: Add Form + Search -->
         <StackPanel Grid.Column="0" 
                     Margin="10">
 
-            <!-- Forma za unos novog entiteta -->
+            <!-- Add Form -->
             <Border Padding="10" 
+                    Margin="0,0,0,15"
                     Background="White" 
-                    CornerRadius="5" 
-                    Margin="0,0,0,15">
+                    CornerRadius="5">
                 <StackPanel>
                     <TextBlock Text="ADD NEW ENTITY"
                                HorizontalAlignment="Center"
-                               FontWeight="Bold" 
-                               Margin="0,0,0,10"/>
+                               Margin="0,0,0,10"
+                               FontFamily="Agency FB"
+                               FontSize="20"
+                               FontWeight="Bold"/>
 
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -42,161 +45,220 @@
                         <StackPanel Grid.Row="0" 
                                     Grid.Column="0" 
                                     Margin="5">
-                            <TextBlock Text="ID:"/>
-                            <TextBox Text="{Binding CurrentEntity.Id, UpdateSourceTrigger=PropertyChanged}"/>
-                            <TextBlock Foreground="Red" 
+                            <TextBlock Text="ID:"
+                                       FontFamily="Consolas"
+                                       FontSize="13"
+                                       FontWeight="Bold"/>
+                            <TextBox Text="{Binding CurrentEntity.Id, UpdateSourceTrigger=PropertyChanged}"
+                                     FontFamily="Consolas"
+                                     FontSize="12"/>
+                            <TextBlock Foreground="Red"
+                                       FontFamily="Consolas"
                                        FontSize="12"
+                                       FontWeight="Bold"
                                        Text="{Binding CurrentEntity.ValidationErrors[Id]}"/>
                         </StackPanel>
 
-                        <!-- Name -->
+                        <!-- NAME -->
                         <StackPanel Grid.Row="0" 
                                     Grid.Column="1" 
                                     Margin="5">
-                            <TextBlock Text="Name:"/>
-                            <TextBox Text="{Binding CurrentEntity.Name, UpdateSourceTrigger=PropertyChanged}"/>
+                            <TextBlock Text="NAME:"
+                                       FontFamily="Consolas"
+                                       FontWeight="Bold"
+                                       FontSize="13"/>
+                            <TextBox Text="{Binding CurrentEntity.Name, UpdateSourceTrigger=PropertyChanged}"
+                                     FontFamily="Consolas"
+                                     FontSize="12"/>
                             <TextBlock Foreground="Red" 
+                                       FontFamily="Consolas"
                                        FontSize="12"
+                                       FontWeight="Bold"
                                        Text="{Binding CurrentEntity.ValidationErrors[Name]}"/>
                         </StackPanel>
 
-                        <!-- Type -->
+                        <!-- TYPE -->
                         <StackPanel Grid.Row="1" 
                                     Grid.Column="0" 
                                     Margin="5">
-                            <TextBlock Text="Type:"/>
+                            <TextBlock Text="TYPE:"
+                                       FontFamily="Consolas"
+                                       FontWeight="Bold"
+                                       FontSize="13"/>
                             <ComboBox ItemsSource="{Binding AvailableTypes}"
                                       SelectedItem="{Binding CurrentEntity.Type, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                       DisplayMemberPath="Name"/>
                             <TextBlock Foreground="Red" 
+                                       FontFamily="Consolas"
                                        FontSize="12"
+                                       FontWeight="Bold"
                                        Text="{Binding CurrentEntity.ValidationErrors[Type]}"/>
                         </StackPanel>
 
-                        <!-- Value -->
+                        <!-- VALUE -->
                         <StackPanel Grid.Row="1" 
                                     Grid.Column="1" 
                                     Margin="5">
-                            <TextBlock Text="Value:"/>
-                            <TextBox Text="{Binding CurrentEntity.Value, UpdateSourceTrigger=PropertyChanged}"/>
+                            <TextBlock Text="VALUE:"
+                                       FontFamily="Consolas"
+                                       FontWeight="Bold"
+                                       FontSize="13"/>
+                            <TextBox Text="{Binding CurrentEntity.Value, UpdateSourceTrigger=PropertyChanged}"
+                                     FontFamily="Consolas"
+                                     FontSize="12"/>
                             <TextBlock Foreground="Red" 
+                                       FontFamily="Consolas"
                                        FontSize="12"
+                                       FontWeight="Bold"
                                        Text="{Binding CurrentEntity.ValidationErrors[Value]}"/>
                         </StackPanel>
                     </Grid>
 
-                    <!-- Add dugme -->
+                    <!-- Add Button -->
                     <Button Content="Add" 
+                            FontFamily="Consolas"
                             Command="{Binding AddCommand}" 
                             Width="100" 
+                            Height="30"
                             Margin="10,10,10,0" 
                             HorizontalAlignment="Center"/>
                 </StackPanel>
             </Border>
 
-            <!-- Search deo -->
+            <!-- Entity Search -->
             <Border Padding="10" 
                     Background="White" 
                     CornerRadius="5">
                 <StackPanel>
                     <TextBlock Text="ENTITY SEARCH"
                                HorizontalAlignment="Center"
-                               FontWeight="Bold" 
-                               Margin="0,0,0,10"/>
+                               Margin="0,0,0,10"
+                               FontFamily="Agency FB"
+                               FontSize="20"
+                               FontWeight="Bold" />
 
                     <StackPanel>
-                        <RadioButton Content="Name" 
+                        <RadioButton Content="Name"
+                                     Margin="54 0 0 0"
+                                     FontFamily="Consolas"
+                                     FontWeight="Bold"
                                      IsChecked="{Binding SearchByName}" 
                                      GroupName="SearchOption"/>
                         <RadioButton Content="Type" 
+                                     Margin="54 0 0 0"
+                                     FontFamily="Consolas"
+                                     FontWeight="Bold"
                                      IsChecked="{Binding SearchByType}" 
                                      GroupName="SearchOption"/>
                     </StackPanel>
 
                     <TextBox Margin="0,10,0,0"
                              Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
-                             Width="200" />
+                             FontFamily="Consolas"
+                             FontSize="12"
+                             Width="200"
+                             Height="32"/>
 
                     <StackPanel Orientation="Horizontal" 
                                 HorizontalAlignment="Center" 
-                                Margin="0,10,0,0">
+                                Margin="3,10,0,0">
                         <Button Content="Apply"
+                                FontFamily="Consolas"
                                 Command="{Binding ApplySearchCommand}" 
-                                Width="75" 
-                                Margin="5,0"/>
+                                Width="97.5"
+                                Height="30"
+                                Margin="0,0,5,0"/>
                         <Button Content="Clear" 
+                                FontFamily="Consolas"
                                 Command="{Binding ClearSearchCommand}" 
-                                Width="75"/>
+                                Width="97.5"
+                                Height="30"/>
                     </StackPanel>
                 </StackPanel>
             </Border>
         </StackPanel>
 
-        <!-- DESNI PANEL: Tabela + Delete -->
-        <Grid Grid.Column="1" Margin="10">
+        <!-- RIGHT PANEL: Table + Delete -->
+        <Grid Grid.Column="1" 
+              Margin="10">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
-                <!-- Tabela -->
                 <RowDefinition Height="Auto"/>
-                <!-- Dugme -->
             </Grid.RowDefinitions>
 
-            <!-- Tabela -->
+            <!-- Table -->
             <DataGrid Grid.Row="0"
-          ItemsSource="{Binding FilteredEntities}"
-          SelectedItem="{Binding SelectedEntity}"
-          AutoGenerateColumns="False" 
-          Margin="0,0,0,10"
-          CanUserAddRows="False"
-          CanUserDeleteRows="False"
-          IsReadOnly="True"
-          ColumnWidth="*">
-
-                <!-- Samo kolone ostaju ovde -->
+                      Margin="0,0,0,10"
+                      ItemsSource="{Binding FilteredEntities}"
+                      SelectedItem="{Binding SelectedEntity}"
+                      AutoGenerateColumns="False" 
+                      CanUserAddRows="False"
+                      CanUserDeleteRows="False"
+                      IsReadOnly="True"
+                      ColumnWidth="*">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="1*">
+                    <DataGridTextColumn Header="ID" 
+                                        Binding="{Binding Id}" 
+                                        Width="1*">
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">
-                                <Setter Property="HorizontalAlignment" Value="Center"/>
-                                <Setter Property="VerticalAlignment" Value="Center"/>
+                                <Setter Property="HorizontalAlignment" 
+                                        Value="Center"/>
+                                <Setter Property="VerticalAlignment" 
+                                        Value="Center"/>
                             </Style>
                         </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>
 
-                    <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="2*">
+                    <DataGridTextColumn Header="Name" 
+                                        Binding="{Binding Name}" 
+                                        Width="2*">
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">
-                                <Setter Property="HorizontalAlignment" Value="Center"/>
-                                <Setter Property="VerticalAlignment" Value="Center"/>
+                                <Setter Property="HorizontalAlignment" 
+                                        Value="Center"/>
+                                <Setter Property="VerticalAlignment" 
+                                        Value="Center"/>
                             </Style>
                         </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>
 
-                    <DataGridTextColumn Header="Type" Binding="{Binding Type}" Width="2*">
+                    <DataGridTextColumn Header="Type" 
+                                        Binding="{Binding Type}" 
+                                        Width="2*">
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">
-                                <Setter Property="HorizontalAlignment" Value="Center"/>
-                                <Setter Property="VerticalAlignment" Value="Center"/>
+                                <Setter Property="HorizontalAlignment" 
+                                        Value="Center"/>
+                                <Setter Property="VerticalAlignment" 
+                                        Value="Center"/>
                             </Style>
                         </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>
 
-                    <DataGridTextColumn Header="Value" Binding="{Binding Value}" Width="1*">
+                    <DataGridTextColumn Header="Value" 
+                                        Binding="{Binding Value}" 
+                                        Width="1*">
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">
-                                <Setter Property="HorizontalAlignment" Value="Center"/>
-                                <Setter Property="VerticalAlignment" Value="Center"/>
+                                <Setter Property="HorizontalAlignment" 
+                                        Value="Center"/>
+                                <Setter Property="VerticalAlignment" 
+                                        Value="Center"/>
                             </Style>
                         </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>
                 </DataGrid.Columns>
             </DataGrid>
 
-            <!-- Delete dugme -->
+            <!-- Delete Button -->
             <Button Grid.Row="1"
+                    Margin="10"
                     Content="Delete Selected" 
+                    FontFamily="Consolas"
                     Command="{Binding DeleteCommand}" 
-                    Width="120" Margin="10" 
+                    Width="120"
+                    Height="30" 
                     HorizontalAlignment="Center"/>
         </Grid>
     </Grid>

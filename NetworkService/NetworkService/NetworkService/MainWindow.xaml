@@ -25,38 +25,81 @@
 
     <DockPanel LastChildFill="True">
 
-        <!-- MENI -->
-        <Menu DockPanel.Dock="Top" Background="LightGray">
-            <MenuItem Header="Entities" Command="{Binding NavCommand}" CommandParameter="entities"/>
-            <MenuItem Header="Network Display" Command="{Binding NavCommand}" CommandParameter="display"/>
-            <MenuItem Header="Measurement Graph" Command="{Binding NavCommand}" CommandParameter="graph"/>
-        </Menu>
-
-        <!-- STATUS BAR (uvek na dnu) -->
-        <DockPanel DockPanel.Dock="Bottom" Background="LightGray" Height="28">
-            <TextBlock Text="Status: " Margin="5,0,0,0" VerticalAlignment="Center"/>
-            <TextBlock Text="{Binding StatusBarMessage}" VerticalAlignment="Center"/>
+        <!-- NAVBAR -->
+        <DockPanel DockPanel.Dock="Top" Background="{StaticResource PrimaryButtonColor}" Height="40">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0,0,0">
+                <Button Content="Network Entities"
+                    Command="{Binding NavCommand}" 
+                    CommandParameter="entities"
+                    Margin="0,0,10,0"/>
+                <Button Content="Network Display"
+                    Command="{Binding NavCommand}" 
+                    CommandParameter="display"
+                    Margin="0,0,10,0"/>
+                <Button Content="Measurement Graph"
+                    Command="{Binding NavCommand}" 
+                    CommandParameter="graph"/>
+            </StackPanel>
         </DockPanel>
 
-        <!-- TERMINAL (iznad status bara, full širina) -->
-        <Border DockPanel.Dock="Bottom" 
-        Background="Black" 
-        Margin="30,5" 
-        Padding="5" 
-        CornerRadius="5">
-            <TextBox Text="{Binding TerminalInput, UpdateSourceTrigger=PropertyChanged}"
-             AcceptsReturn="True"
-             VerticalScrollBarVisibility="Auto"
-             Foreground="LightGreen"
-             Background="Black"
-             FontFamily="Consolas"
-             FontSize="13"
-             TextWrapping="Wrap"
-             Width="800"
-             Height="120"/>
+        <!-- STATUS BAR -->
+        <Border DockPanel.Dock="Bottom"
+            Background="{StaticResource PrimaryButtonColor}"
+            Padding="10,0"
+            Height="30">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <TextBlock Text="⚡ Status:"
+                       Foreground="White"
+                       FontWeight="Bold"
+                       VerticalAlignment="Center"
+                       Margin="0,0,5,0"/>
+                <TextBlock Text="{Binding StatusBarMessage}"
+                       Foreground="White"
+                       VerticalAlignment="Center"/>
+            </StackPanel>
         </Border>
 
-        <!-- CENTRALNI SADRŽAJ -->
+        <!-- TERMINAL -->
+        <Border DockPanel.Dock="Bottom"
+            Background="#111"
+            BorderBrush="#333"
+            BorderThickness="1"
+            CornerRadius="6"
+            Margin="20,10"
+            Padding="0">
+
+            <DockPanel>
+                <!-- HEADER TERMINALA -->
+                <DockPanel DockPanel.Dock="Top" Background="#222" Height="24" LastChildFill="False">
+                    <Ellipse Width="10" Height="10" Fill="Red" Margin="6,0"/>
+                    <Ellipse Width="10" Height="10" Fill="Orange" Margin="3,0"/>
+                    <Ellipse Width="10" Height="10" Fill="LimeGreen" Margin="6,0"/>
+                    <TextBlock Text=" Terminal"
+                               Foreground="LightGray"
+                               FontFamily="Agency FB"
+                               FontSize="16"
+                               VerticalAlignment="Center"
+                               Margin="10,0,0,0"/>
+                </DockPanel>
+
+                <!-- INPUT POLJE TERMINALA -->
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <TextBox Text="{Binding TerminalInput, UpdateSourceTrigger=PropertyChanged}"
+                     AcceptsReturn="True"
+                     Foreground="LightGreen"
+                     Background="Black"
+                     BorderThickness="0"
+                     FontFamily="Consolas"
+                     FontSize="14"
+                     TextWrapping="Wrap"
+                     Padding="10"
+                     Margin="0"
+                     VerticalScrollBarVisibility="Hidden"/>
+                </ScrollViewer>
+            </DockPanel>
+        </Border>
+
+        <!-- CENTRALNI SADRZAJ -->
         <ContentControl Content="{Binding CurrentViewModel}" />
 
     </DockPanel>

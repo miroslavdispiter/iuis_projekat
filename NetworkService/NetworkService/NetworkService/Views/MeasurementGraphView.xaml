@@ -11,7 +11,7 @@
         <conv:PointsConverter x:Key="PointsConverter"/>
     </UserControl.Resources>
 
-    <Grid Background="White" Margin="10">
+    <Grid Background="#EAF4FF" Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
