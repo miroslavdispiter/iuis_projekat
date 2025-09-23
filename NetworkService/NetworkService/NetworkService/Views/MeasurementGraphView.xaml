@@ -9,17 +9,23 @@
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <conv:PointsConverter x:Key="PointsConverter"/>
+        <conv:CenterOffsetConverter x:Key="CenterOffsetConverter"/>
     </UserControl.Resources>
 
-    <Grid Background="#EAF4FF" Margin="10">
+    <Grid Background="#EAF4FF" 
+          Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
         <!-- Odabir entiteta -->
-        <StackPanel Orientation="Horizontal" Margin="10">
-            <TextBlock Text="Select Entity:" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,5,0"/>
+        <StackPanel Orientation="Horizontal" 
+                    Margin="10">
+            <TextBlock Text="Select Entity:" 
+                       FontWeight="Bold" 
+                       VerticalAlignment="Center" 
+                       Margin="0,0,5,0"/>
             <ComboBox Width="200"
                       ItemsSource="{Binding Entities}"
                       SelectedItem="{Binding SelectedEntity}"
@@ -27,27 +33,49 @@
         </StackPanel>
 
         <!-- GLAVNI GRAF -->
-        <Canvas Grid.Row="1" Width="650" Height="300" Background="#FAFAFA" Margin="10">
+        <Canvas Grid.Row="1" 
+                Width="650" 
+                Height="300" 
+                Background="#FAFAFA" 
+                Margin="10">
             <!-- Polyline koja spaja tacke -->
-            <Polyline Stroke="DarkBlue" StrokeThickness="2"
-                      Points="{Binding Measurements, Converter={StaticResource PointsConverter}}"/>
+            <Polyline Stroke="DarkBlue"
+          StrokeThickness="2"
+          Points="{Binding GraphPoints}"/>
 
             <!-- Kuglice -->
             <ItemsControl ItemsSource="{Binding Measurements}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <Canvas />
+                        <Canvas/>
+                        <!-- ovde se sve crta po koordinatama -->
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
+
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Ellipse Width="8" Height="8" Fill="DarkBlue"
-                                 Canvas.Left="{Binding RelativeX}"
-                                 Canvas.Top="{Binding RelativeY}">
-                            <Ellipse.ToolTip>
-                                <TextBlock Text="{Binding Value}"/>
-                            </Ellipse.ToolTip>
-                        </Ellipse>
+                        <Canvas>
+                            <!-- Krug -->
+                            <Ellipse Width="20"
+                     Height="20"
+                     Fill="LightBlue"
+                     Stroke="DarkBlue"
+                     StrokeThickness="2"
+                     Canvas.Left="{Binding RelativeX, Converter={StaticResource CenterOffsetConverter}, ConverterParameter=20}"
+                     Canvas.Top="{Binding RelativeY, Converter={StaticResource CenterOffsetConverter}, ConverterParameter=20}"/>
+
+                            <!-- Broj unutar kruga -->
+                            <TextBlock Text="{Binding Value}"
+                       FontWeight="Bold"
+                       FontSize="10"
+                       Foreground="DarkBlue"
+                       Width="20"
+                       Height="20"
+                       TextAlignment="Center"
+                       VerticalAlignment="Center"
+                       Canvas.Left="{Binding RelativeX, Converter={StaticResource CenterOffsetConverter}, ConverterParameter=20}"
+                       Canvas.Top="{Binding RelativeY, Converter={StaticResource CenterOffsetConverter}, ConverterParameter=20}"/>
+                        </Canvas>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>

@@ -58,6 +58,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Converters\CenterOffsetConverter.cs" />
     <Compile Include="Helpers\BindableBase.cs" />
     <Compile Include="Converters\PointsConverter.cs" />
     <Compile Include="Helpers\DropBehavior.cs" />

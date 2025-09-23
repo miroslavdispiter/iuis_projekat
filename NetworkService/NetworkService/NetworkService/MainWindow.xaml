@@ -26,36 +26,41 @@
     <DockPanel LastChildFill="True">
 
         <!-- NAVBAR -->
-        <DockPanel DockPanel.Dock="Top" Background="{StaticResource PrimaryButtonColor}" Height="40">
-            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="10,0,0,0">
+        <DockPanel DockPanel.Dock="Top" 
+                   Background="{StaticResource PrimaryButtonColor}" 
+                   Height="40">
+            <StackPanel Orientation="Horizontal" 
+                        VerticalAlignment="Center" 
+                        Margin="10,0,0,0">
                 <Button Content="Network Entities"
-                    Command="{Binding NavCommand}" 
-                    CommandParameter="entities"
-                    Margin="0,0,10,0"/>
+                        Command="{Binding NavCommand}" 
+                        CommandParameter="entities"
+                        Margin="0,0,10,0"/>
                 <Button Content="Network Display"
-                    Command="{Binding NavCommand}" 
-                    CommandParameter="display"
-                    Margin="0,0,10,0"/>
+                        Command="{Binding NavCommand}" 
+                        CommandParameter="display"
+                        Margin="0,0,10,0"/>
                 <Button Content="Measurement Graph"
-                    Command="{Binding NavCommand}" 
-                    CommandParameter="graph"/>
+                        Command="{Binding NavCommand}" 
+                        CommandParameter="graph"/>
             </StackPanel>
         </DockPanel>
 
         <!-- STATUS BAR -->
         <Border DockPanel.Dock="Bottom"
-            Background="{StaticResource PrimaryButtonColor}"
-            Padding="10,0"
-            Height="30">
-            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                Background="{StaticResource PrimaryButtonColor}"
+                Padding="10,0"
+                Height="30">
+            <StackPanel Orientation="Horizontal" 
+                        VerticalAlignment="Center">
                 <TextBlock Text="⚡ Status:"
-                       Foreground="White"
-                       FontWeight="Bold"
-                       VerticalAlignment="Center"
-                       Margin="0,0,5,0"/>
+                           Foreground="White"
+                           FontWeight="Bold"
+                           VerticalAlignment="Center"
+                           Margin="0,0,5,0"/>
                 <TextBlock Text="{Binding StatusBarMessage}"
-                       Foreground="White"
-                       VerticalAlignment="Center"/>
+                           Foreground="White"
+                           VerticalAlignment="Center"/>
             </StackPanel>
         </Border>
 
@@ -70,10 +75,22 @@
 
             <DockPanel>
                 <!-- HEADER TERMINALA -->
-                <DockPanel DockPanel.Dock="Top" Background="#222" Height="24" LastChildFill="False">
-                    <Ellipse Width="10" Height="10" Fill="Red" Margin="6,0"/>
-                    <Ellipse Width="10" Height="10" Fill="Orange" Margin="3,0"/>
-                    <Ellipse Width="10" Height="10" Fill="LimeGreen" Margin="6,0"/>
+                <DockPanel DockPanel.Dock="Top" 
+                           Background="#222" 
+                           Height="24" 
+                           LastChildFill="False">
+                    <Ellipse Width="10" 
+                             Height="10" 
+                             Fill="Red" 
+                             Margin="6,0"/>
+                    <Ellipse Width="10" 
+                             Height="10" 
+                             Fill="Orange" 
+                             Margin="3,0"/>
+                    <Ellipse Width="10" 
+                             Height="10" 
+                             Fill="LimeGreen" 
+                             Margin="6,0"/>
                     <TextBlock Text=" Terminal"
                                Foreground="LightGray"
                                FontFamily="Agency FB"

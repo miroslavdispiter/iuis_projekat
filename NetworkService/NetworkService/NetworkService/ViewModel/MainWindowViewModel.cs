@@ -31,6 +31,12 @@ namespace NetworkService.ViewModel
             set => SetProperty(ref _terminalInput, value);
         }
 
+        public BindableBase CurrentViewModel
+        {
+            get => _currentViewModel;
+            set => SetProperty(ref _currentViewModel, value);
+        }
+
         public MainWindowViewModel()
         {
             var solarType = new EntityType { Name = "Solar Panel", ImagePath = "/Images/solar.png" };
@@ -54,12 +60,6 @@ namespace NetworkService.ViewModel
             CurrentViewModel = entitiesViewModel;
 
             CreateListener();
-        }
-
-        public BindableBase CurrentViewModel
-        {
-            get => _currentViewModel;
-            set => SetProperty(ref _currentViewModel, value);
         }
 
         private void OnNav(string destination)

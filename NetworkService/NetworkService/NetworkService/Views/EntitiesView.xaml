@@ -17,7 +17,6 @@
         <!-- LEVI PANEL: Add Form + Search -->
         <StackPanel Grid.Column="0" 
                     Margin="10">
-
             <!-- Add Form -->
             <Border Padding="10" 
                     Margin="0,0,0,15"

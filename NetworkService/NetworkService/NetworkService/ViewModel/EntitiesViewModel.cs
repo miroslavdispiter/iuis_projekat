@@ -99,10 +99,6 @@ namespace NetworkService.ViewModel
                 RefreshFilter();
                 CurrentEntity = new Entity();
             }
-            else
-            {
-                MessageBox.Show("Some fields are not valid. Please check input.");
-            }
         }
 
         private void OnDelete()

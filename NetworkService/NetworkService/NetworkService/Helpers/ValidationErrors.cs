@@ -17,8 +17,7 @@ namespace NetworkService.Helpers
         {
             get
             {
-                return validationErrors.ContainsKey(fieldName) ?
-                    validationErrors[fieldName] : string.Empty;
+                return validationErrors.ContainsKey(fieldName) ? validationErrors[fieldName] : string.Empty;
             }
             set
             {
