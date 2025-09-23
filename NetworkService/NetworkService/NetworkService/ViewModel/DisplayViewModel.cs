@@ -116,7 +116,7 @@ namespace NetworkService.ViewModel
                 }
                 else
                 {
-                    MessageBox.Show("Slot već zauzet!");
+                    MessageBox.Show("Slot vec zauzet!");
                 }
 
                 DraggedEntity = null;

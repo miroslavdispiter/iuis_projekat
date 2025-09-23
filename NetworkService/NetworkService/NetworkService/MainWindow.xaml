@@ -39,16 +39,22 @@
         </DockPanel>
 
         <!-- TERMINAL (iznad status bara, full širina) -->
-        <Grid DockPanel.Dock="Bottom" Background="Black" Height="120">
+        <Border DockPanel.Dock="Bottom" 
+        Background="Black" 
+        Margin="30,5" 
+        Padding="5" 
+        CornerRadius="5">
             <TextBox Text="{Binding TerminalInput, UpdateSourceTrigger=PropertyChanged}"
-                     AcceptsReturn="True"
-                     VerticalScrollBarVisibility="Auto"
-                     Foreground="LightGreen"
-                     Background="Black"
-                     FontFamily="Consolas"
-                     FontSize="13"
-                     TextWrapping="Wrap"/>
-        </Grid>
+             AcceptsReturn="True"
+             VerticalScrollBarVisibility="Auto"
+             Foreground="LightGreen"
+             Background="Black"
+             FontFamily="Consolas"
+             FontSize="13"
+             TextWrapping="Wrap"
+             Width="800"
+             Height="120"/>
+        </Border>
 
         <!-- CENTRALNI SADRŽAJ -->
         <ContentControl Content="{Binding CurrentViewModel}" />
