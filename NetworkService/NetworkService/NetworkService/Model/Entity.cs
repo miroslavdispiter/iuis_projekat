@@ -58,7 +58,17 @@ namespace NetworkService.Model
                 {
                     _value = value;
                     OnPropertyChanged(nameof(Value));
+                    OnPropertyChanged(nameof(IsInDanger));
                 }
+            }
+        }
+
+        public bool IsInDanger
+        {
+            get
+            {
+                if (Value == null) return false;
+                return Value < 1 || Value > 5;
             }
         }
 

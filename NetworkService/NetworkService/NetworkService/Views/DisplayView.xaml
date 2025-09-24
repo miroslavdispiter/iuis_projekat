@@ -83,16 +83,30 @@
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <!-- UNUTAR SLOTA -->
-                        <Border BorderBrush="Gray" 
-                                BorderThickness="1" 
-                                Margin="8" 
-                                Background="White" 
+                        <Border Margin="8" 
                                 CornerRadius="4"
                                 Width="80" 
                                 Height="80"
                                 VerticalAlignment="Center" 
                                 HorizontalAlignment="Center"
                                 AllowDrop="True">
+
+                            <!-- STYLE ZA BORDER -->
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="BorderBrush" Value="Gray"/>
+                                    <Setter Property="BorderThickness" Value="1"/>
+                                    <Setter Property="Background" Value="White"/>
+                                    <Style.Triggers>
+                                        <!-- Kada entitet ima kritičnu vrednost -->
+                                        <DataTrigger Binding="{Binding CanvasEntity.IsInDanger}" Value="True">
+                                            <Setter Property="BorderBrush" Value="Red"/>
+                                            <Setter Property="BorderThickness" Value="3"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+
                             <Grid Margin="4">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"/>
