@@ -5,12 +5,12 @@ namespace NetworkService.Model
 {
     public class Entity : ValidationBase
     {
-        private int _id;
+        private int? _id;
         private string _name;
         private EntityType _type;
-        private double _value;
+        private double? _value;
 
-        public int Id
+        public int? Id
         {
             get => _id;
             set
@@ -49,7 +49,7 @@ namespace NetworkService.Model
             }
         }
 
-        public double Value
+        public double? Value
         {
             get => _value;
             set
@@ -64,7 +64,9 @@ namespace NetworkService.Model
 
         protected override void ValidateSelf()
         {
-            if (Id < 0)
+            if (Id == null)
+                ValidationErrors[nameof(Id)] = "ID is required.";
+            else if (Id < 0)
                 ValidationErrors[nameof(Id)] = "ID must be non-negative.";
 
             if (string.IsNullOrWhiteSpace(Name))
@@ -73,8 +75,10 @@ namespace NetworkService.Model
             if (Type == null)
                 ValidationErrors[nameof(Type)] = "Type must be selected.";
 
-            if (Value < 0)
-                ValidationErrors[nameof(Value)] = "Value must be positive.";
+            if (Value == null)
+                ValidationErrors[nameof(Value)] = "Value is required.";
+            else if (Value < 0 || Value > 10)
+                ValidationErrors[nameof(Value)] = "Value must be in range 0-10.";
         }
 
         public override string ToString()
