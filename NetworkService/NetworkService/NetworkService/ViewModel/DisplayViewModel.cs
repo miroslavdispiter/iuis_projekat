@@ -159,6 +159,8 @@ namespace NetworkService.ViewModel
                     Y2 = dstCenter.Y
                 });
 
+                Undo.UndoManager.Register(new Undo.AddConnectionUndoCommand(Linije.Last(), this));
+
                 _firstSelectedForLine = null;
             }
         }
@@ -204,6 +206,8 @@ namespace NetworkService.ViewModel
                     slot.CanvasEntity = DraggedEntity;
                     RemoveFromGroups(DraggedEntity);
                     UpdateLinesForEntity(DraggedEntity);
+
+                    Undo.UndoManager.Register(new Undo.MoveEntityUndoCommand(oldSlot, slot, DraggedEntity, this));
                 }
                 else
                 {
@@ -221,17 +225,20 @@ namespace NetworkService.ViewModel
             {
                 var oldSlot = CanvasSlots.FirstOrDefault(s => s.CanvasEntity == DraggedEntity);
                 if (oldSlot != null)
-                    oldSlot.CanvasEntity = null;
-
-                // obrisati sve linije vezane za taj entitet
-                for (int i = Linije.Count - 1; i >= 0; i--)
                 {
-                    if (Linije[i].SrcId == DraggedEntity.Id || Linije[i].DstId == DraggedEntity.Id)
-                        Linije.RemoveAt(i);
-                }
+                    var removedLines = Linije
+                        .Where(l => l.SrcId == DraggedEntity.Id || l.DstId == DraggedEntity.Id)
+                        .ToList();
 
-                AddToGroups(DraggedEntity);
-                DraggedEntity = null;
+                    for (int i = Linije.Count - 1; i >= 0; i--)
+                        if (Linije[i].SrcId == DraggedEntity.Id || Linije[i].DstId == DraggedEntity.Id)
+                            Linije.RemoveAt(i);
+
+                    oldSlot.CanvasEntity = null;
+                    AddToGroups(DraggedEntity);
+
+                    Undo.UndoManager.Register(new Undo.RemoveFromCanvasUndoCommand(oldSlot, DraggedEntity, removedLines, this));
+                }
             }
         }
 
@@ -253,14 +260,12 @@ namespace NetworkService.ViewModel
             {
                 foreach (Entity removed in e.OldItems)
                 {
-                    // obriši sve linije povezane sa tim entitetom
                     for (int i = Linije.Count - 1; i >= 0; i--)
                     {
                         if (Linije[i].SrcId == removed.Id || Linije[i].DstId == removed.Id)
                             Linije.RemoveAt(i);
                     }
 
-                    // obriši entitet sa canvas slotova
                     foreach (var slot in CanvasSlots)
                     {
                         if (slot.CanvasEntity?.Id == removed.Id)

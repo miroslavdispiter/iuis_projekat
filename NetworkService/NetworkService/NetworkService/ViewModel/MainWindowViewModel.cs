@@ -70,17 +70,26 @@ namespace NetworkService.ViewModel
 
         private void OnNav(string destination)
         {
+            BindableBase prev = CurrentViewModel;
+            BindableBase next = null;
+
             switch (destination)
             {
                 case "entities":
-                    CurrentViewModel = entitiesViewModel;
+                    next = entitiesViewModel;
                     break;
                 case "display":
-                    CurrentViewModel = displayViewModel;
+                    next = displayViewModel;
                     break;
                 case "graph":
-                    CurrentViewModel = graphViewModel;
+                    next = graphViewModel;
                     break;
+            }
+
+            if (next != null && prev != next)
+            {
+                CurrentViewModel = next;
+                Undo.UndoManager.Register(new Undo.ChangeViewUndoCommand(this, prev, next));
             }
         }
 
@@ -123,6 +132,7 @@ namespace NetworkService.ViewModel
                     helpText += " - place <entityId> <row> <col>\n";
                     helpText += " - remove <entityId>\n";
                     helpText += " - clearcanvas\n";
+                    helpText += " - connect <entityId1> <entityId2>\n";
                     helpText += " - nav <entities|display|graph>\n";
                 }
                 else if (CurrentViewModel == graphViewModel)
@@ -135,7 +145,6 @@ namespace NetworkService.ViewModel
                     helpText += " - nav <entities|display|graph>\n";
                 }
 
-                // dodaj hint na kraj
                 helpText += "\nPress Enter to continue...";
 
                 TerminalInput = helpText;
@@ -310,7 +319,12 @@ namespace NetworkService.ViewModel
                             if (slot.CanvasEntity == null)
                             {
                                 slot.CanvasEntity = entity;
+
                                 typeof(DisplayViewModel).GetMethod("RemoveFromGroups",
+                                    System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                                    .Invoke(displayViewModel, new object[] { entity });
+
+                                typeof(DisplayViewModel).GetMethod("UpdateLinesForEntity",
                                     System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
                                     .Invoke(displayViewModel, new object[] { entity });
                             }
@@ -334,6 +348,16 @@ namespace NetworkService.ViewModel
                         if (entity != null && slot != null)
                         {
                             slot.CanvasEntity = null;
+
+                            for (int i = displayViewModel.Linije.Count - 1; i >= 0; i--)
+                            {
+                                if (displayViewModel.Linije[i].SrcId == entity.Id ||
+                                    displayViewModel.Linije[i].DstId == entity.Id)
+                                {
+                                    displayViewModel.Linije.RemoveAt(i);
+                                }
+                            }
+
                             typeof(DisplayViewModel).GetMethod("AddToGroups",
                                 System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
                                 .Invoke(displayViewModel, new object[] { entity });
@@ -358,6 +382,73 @@ namespace NetworkService.ViewModel
                                 .Invoke(displayViewModel, new object[] { ent });
                         }
                     }
+                    TerminalInput = string.Empty;
+                    return;
+                }
+
+                // connect <srcEntityId> <dstEntityId>
+                if (command == "connect")
+                {
+                    if (parts.Length < 3) { TerminalInput = string.Empty; return; }
+                    try
+                    {
+                        int id1 = int.Parse(parts[1]);
+                        int id2 = int.Parse(parts[2]);
+
+                        var entity1 = displayViewModel.Entities.FirstOrDefault(e => e.Id == id1);
+                        var entity2 = displayViewModel.Entities.FirstOrDefault(e => e.Id == id2);
+
+                        if (entity1 == null || entity2 == null)
+                        {
+                            TerminalInput = $"One of the entities not found!";
+                            return;
+                        }
+
+                        var srcSlot = displayViewModel.CanvasSlots.FirstOrDefault(s => s.CanvasEntity?.Id == entity1.Id);
+                        var dstSlot = displayViewModel.CanvasSlots.FirstOrDefault(s => s.CanvasEntity?.Id == entity2.Id);
+
+                        if (srcSlot == null || dstSlot == null)
+                        {
+                            TerminalInput = "Both entities must be placed on canvas!";
+                            return;
+                        }
+
+                        if (entity1.Type.Name == entity2.Type.Name)
+                        {
+                            TerminalInput = "Cannot connect two entities of the same type!";
+                            return;
+                        }
+
+                        if (displayViewModel.Linije.Any(l =>
+                            (l.SrcId == entity1.Id && l.DstId == entity2.Id) ||
+                            (l.SrcId == entity2.Id && l.DstId == entity1.Id)))
+                        {
+                            TerminalInput = "Connection already exists!";
+                            return;
+                        }
+
+                        var srcCenter = typeof(DisplayViewModel)
+                            .GetMethod("GetSlotCenter", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                            .Invoke(displayViewModel, new object[] { srcSlot }) as System.Windows.Point?;
+
+                        var dstCenter = typeof(DisplayViewModel)
+                            .GetMethod("GetSlotCenter", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                            .Invoke(displayViewModel, new object[] { dstSlot }) as System.Windows.Point?;
+
+                        var line = new ConnectionLine
+                        {
+                            SrcId = entity1.Id.Value,
+                            DstId = entity2.Id.Value,
+                            X1 = srcCenter.Value.X,
+                            Y1 = srcCenter.Value.Y,
+                            X2 = dstCenter.Value.X,
+                            Y2 = dstCenter.Value.Y
+                        };
+
+                        displayViewModel.Linije.Add(line);
+                        Undo.UndoManager.Register(new Undo.AddConnectionUndoCommand(line, displayViewModel));
+                    }
+                    catch { }
                     TerminalInput = string.Empty;
                     return;
                 }
