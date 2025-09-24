@@ -17,6 +17,7 @@ namespace NetworkService.ViewModel
         public ObservableCollection<Entity> Entities { get; set; }
         public ObservableCollection<EntityGroup> EntityGroups { get; set; }
         public ObservableCollection<CanvasSlot> CanvasSlots { get; set; }
+        public ObservableCollection<ConnectionLine> Linije { get; set; }
 
         private Entity _draggedEntity;
         public Entity DraggedEntity
@@ -25,6 +26,8 @@ namespace NetworkService.ViewModel
             set => SetProperty(ref _draggedEntity, value);
         }
 
+        private Entity _firstSelectedForLine;
+        public MyICommand<object> ConnectCommand { get; private set; }
         public MyICommand<object> DragOverCommand { get; private set; }
         public MyICommand<object> DropCommand { get; private set; }
         public MyICommand<object> MouseDownCommand { get; private set; }
@@ -34,6 +37,7 @@ namespace NetworkService.ViewModel
         public DisplayViewModel(ObservableCollection<Entity> sharedEntities)
         {
             Entities = sharedEntities;
+            Linije = new ObservableCollection<ConnectionLine>();
 
             EntityGroups = new ObservableCollection<EntityGroup>
             {
@@ -48,15 +52,33 @@ namespace NetworkService.ViewModel
 
             RefreshGroups();
 
-            Entities.CollectionChanged += (s, e) => RefreshGroups();
+            Entities.CollectionChanged += (s, e) =>
+            {
+                RefreshGroups();
+
+                // LINIJE: brisanje ako entitet obrisan
+                if (e.Action == NotifyCollectionChangedAction.Remove)
+                {
+                    foreach (Entity removed in e.OldItems)
+                    {
+                        for (int i = Linije.Count - 1; i >= 0; i--)
+                        {
+                            if (Linije[i].SrcId == removed.Id || Linije[i].DstId == removed.Id)
+                                Linije.RemoveAt(i);
+                        }
+                    }
+                }
+            };
 
             DragOverCommand = new MyICommand<object>(OnDragOver);
             DropCommand = new MyICommand<object>(OnDrop);
             MouseDownCommand = new MyICommand<object>(OnMouseDown);
             MouseUpCommand = new MyICommand(OnMouseUp);
             TreeViewDropCommand = new MyICommand<object>(OnTreeViewDrop);
+            ConnectCommand = new MyICommand<object>(OnConnectCommand);
         }
 
+        // === POMOĆNE ===
         private void RefreshGroups()
         {
             foreach (var group in EntityGroups)
@@ -74,6 +96,90 @@ namespace NetworkService.ViewModel
             }
         }
 
+        private Point GetSlotCenter(CanvasSlot slot)
+        {
+            double cellWidth = 800 / 4;
+            double cellHeight = 450 / 3;
+            double x = slot.Col * cellWidth + cellWidth / 2;
+            double y = slot.Row * cellHeight + cellHeight / 2;
+            return new Point(x, y);
+        }
+
+        private void UpdateLinesForEntity(Entity entity)
+        {
+            var slot = CanvasSlots.FirstOrDefault(s => s.CanvasEntity?.Id == entity.Id);
+            if (slot == null) return;
+
+            var center = GetSlotCenter(slot);
+            foreach (var line in Linije)
+            {
+                if (line.SrcId == entity.Id)
+                {
+                    line.X1 = center.X; line.Y1 = center.Y;
+                }
+                if (line.DstId == entity.Id)
+                {
+                    line.X2 = center.X; line.Y2 = center.Y;
+                }
+            }
+        }
+
+        // === LINIJE ===
+        private void OnConnectCommand(object obj)
+        {
+            if (!(obj is Entity selected)) return;
+
+            if (_firstSelectedForLine == null)
+            {
+                _firstSelectedForLine = selected;
+                return;
+            }
+
+            if (_firstSelectedForLine != null && selected != _firstSelectedForLine)
+            {
+                if (_firstSelectedForLine.Type.Name == selected.Type.Name)
+                {
+                    MessageBox.Show("Možete povezati samo Solar i Wind generator!");
+                    _firstSelectedForLine = null;
+                    return;
+                }
+
+                if (Linije.Any(l =>
+                    (l.SrcId == _firstSelectedForLine.Id && l.DstId == selected.Id) ||
+                    (l.SrcId == selected.Id && l.DstId == _firstSelectedForLine.Id)))
+                {
+                    MessageBox.Show("Veza već postoji!");
+                    _firstSelectedForLine = null;
+                    return;
+                }
+
+                var srcSlot = CanvasSlots.FirstOrDefault(s => s.CanvasEntity?.Id == _firstSelectedForLine.Id);
+                var dstSlot = CanvasSlots.FirstOrDefault(s => s.CanvasEntity?.Id == selected.Id);
+                if (srcSlot == null || dstSlot == null)
+                {
+                    MessageBox.Show("Oba entiteta moraju biti na canvas mreži!");
+                    _firstSelectedForLine = null;
+                    return;
+                }
+
+                var srcCenter = GetSlotCenter(srcSlot);
+                var dstCenter = GetSlotCenter(dstSlot);
+
+                Linije.Add(new ConnectionLine
+                {
+                    SrcId = _firstSelectedForLine.Id.Value,
+                    DstId = selected.Id.Value,
+                    X1 = srcCenter.X,
+                    Y1 = srcCenter.Y,
+                    X2 = dstCenter.X,
+                    Y2 = dstCenter.Y
+                });
+
+                _firstSelectedForLine = null;
+            }
+        }
+
+        // === DRAG&DROP ===
         private void OnMouseDown(object obj)
         {
             if (obj is Entity entity)
@@ -113,6 +219,7 @@ namespace NetworkService.ViewModel
                 {
                     slot.CanvasEntity = DraggedEntity;
                     RemoveFromGroups(DraggedEntity);
+                    UpdateLinesForEntity(DraggedEntity);
                 }
                 else
                 {
@@ -123,6 +230,7 @@ namespace NetworkService.ViewModel
             }
         }
 
+        // === TREEVIEW DROP (vracanje) ===
         private void OnTreeViewDrop(object obj)
         {
             if (DraggedEntity != null)
@@ -131,18 +239,20 @@ namespace NetworkService.ViewModel
                 if (oldSlot != null)
                     oldSlot.CanvasEntity = null;
 
-                AddToGroups(DraggedEntity);
+                // obrisati sve linije vezane za taj entitet
+                for (int i = Linije.Count - 1; i >= 0; i--)
+                {
+                    if (Linije[i].SrcId == DraggedEntity.Id || Linije[i].DstId == DraggedEntity.Id)
+                        Linije.RemoveAt(i);
+                }
 
+                AddToGroups(DraggedEntity);
                 DraggedEntity = null;
             }
         }
 
-        private void RemoveFromGroups(Entity e)
-        {
-            foreach (var g in EntityGroups)
-                g.Entities.Remove(e);
-        }
-
+        // === GROUPS ===
+        private void RemoveFromGroups(Entity e) { foreach (var g in EntityGroups) g.Entities.Remove(e); }
         private void AddToGroups(Entity e)
         {
             if (e.Type.Name == "Solar Panel" && !EntityGroups[0].Entities.Contains(e))

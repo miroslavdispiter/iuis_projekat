@@ -65,6 +65,7 @@
     <Compile Include="Helpers\ValidationBase.cs" />
     <Compile Include="Helpers\ValidationErrors.cs" />
     <Compile Include="Model\CanvasSlot.cs" />
+    <Compile Include="Model\ConnectionLine.cs" />
     <Compile Include="Model\Entity.cs" />
     <Compile Include="Model\EntityGroup.cs" />
     <Compile Include="Model\EntityType.cs" />
