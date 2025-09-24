@@ -98,9 +98,15 @@ namespace NetworkService.ViewModel
 
             string command = parts[0].ToLower();
 
+            // === ADD ===
             if (command == "add")
             {
-                // Očekujemo: add [Id] [Name] [Type...] [Value]
+                if (CurrentViewModel != entitiesViewModel)
+                {
+                    TerminalInput = string.Empty;
+                    return;
+                }
+
                 if (parts.Length < 5)
                 {
                     TerminalInput = string.Empty;
@@ -143,18 +149,21 @@ namespace NetworkService.ViewModel
 
                     ((ICommand)entitiesViewModel.AddCommand).Execute(null);
                 }
-                catch
-                {
-                    // Ako parsiranje ne uspe → ignoriši
-                }
+                catch { }
 
                 TerminalInput = string.Empty;
                 return;
             }
 
+            // === DELETE ===
             if (command == "delete")
             {
-                // Očekujemo: delete [Id]
+                if (CurrentViewModel != entitiesViewModel)
+                {
+                    TerminalInput = string.Empty;
+                    return;
+                }
+
                 if (parts.Length < 2)
                 {
                     TerminalInput = string.Empty;
@@ -174,15 +183,86 @@ namespace NetworkService.ViewModel
                         ((ICommand)entitiesViewModel.DeleteCommand).Execute(null);
                     }
                 }
-                catch
+                catch { }
+
+                TerminalInput = string.Empty;
+                return;
+            }
+
+            // === SEARCH ===
+            if (command == "search")
+            {
+                if (CurrentViewModel != entitiesViewModel)
                 {
-                    // Ako parsiranje ne uspe – ništa
+                    TerminalInput = string.Empty;
+                    return;
+                }
+
+                if (parts.Length < 3)
+                {
+                    TerminalInput = string.Empty;
+                    return;
+                }
+
+                string searchText = parts[1];
+                string mode = parts[2].ToLower();
+
+                entitiesViewModel.SearchText = searchText;
+                entitiesViewModel.SearchByName = mode == "name";
+                entitiesViewModel.SearchByType = mode == "type";
+
+                ((ICommand)entitiesViewModel.ApplySearchCommand).Execute(null);
+
+                TerminalInput = string.Empty;
+                return;
+            }
+
+            // === CLEAR SEARCH ===
+            if (command == "clearsearch")
+            {
+                if (CurrentViewModel != entitiesViewModel)
+                {
+                    TerminalInput = string.Empty;
+                    return;
+                }
+
+                ((ICommand)entitiesViewModel.ClearSearchCommand).Execute(null);
+
+                TerminalInput = string.Empty;
+                return;
+            }
+
+            // === SELECT ENTITY (GraphView) ===
+            if (command == "select")
+            {
+                if (CurrentViewModel != graphViewModel)
+                {
+                    TerminalInput = string.Empty;
+                    return;
+                }
+
+                if (parts.Length < 2)
+                {
+                    TerminalInput = string.Empty;
+                    return;
+                }
+
+                string entityName = string.Join(" ", parts.Skip(1));
+
+                var entityToSelect = graphViewModel.Entities
+                    .FirstOrDefault(e =>
+                        string.Equals(e.Name, entityName, StringComparison.OrdinalIgnoreCase));
+
+                if (entityToSelect != null)
+                {
+                    graphViewModel.SelectedEntity = entityToSelect;
                 }
 
                 TerminalInput = string.Empty;
                 return;
             }
 
+            // === NAVIGATION ===
             if (command == "nav")
             {
                 if (parts.Length > 1)
