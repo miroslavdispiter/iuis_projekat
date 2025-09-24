@@ -98,6 +98,43 @@ namespace NetworkService.ViewModel
 
             string command = parts[0].ToLower();
 
+            // === HELP ===
+            if (command == "help")
+            {
+                string helpText = "Available commands:\n";
+
+                if (CurrentViewModel == entitiesViewModel)
+                {
+                    helpText += " - add <id> <name> <type> <value>\n";
+                    helpText += " - delete <id>\n";
+                    helpText += " - search <text> <name|type>\n";
+                    helpText += " - clearsearch\n";
+                    helpText += " - nav <entities|display|graph>\n";
+                }
+                else if (CurrentViewModel == displayViewModel)
+                {
+                    helpText += " - place <entityId> <row> <col>\n";
+                    helpText += " - remove <entityId>\n";
+                    helpText += " - clearcanvas\n";
+                    helpText += " - nav <entities|display|graph>\n";
+                }
+                else if (CurrentViewModel == graphViewModel)
+                {
+                    helpText += " - select <entityName>\n";
+                    helpText += " - nav <entities|display|graph>\n";
+                }
+                else
+                {
+                    helpText += " - nav <entities|display|graph>\n";
+                }
+
+                // dodaj hint na kraj
+                helpText += "\nPress Enter to continue...";
+
+                TerminalInput = helpText;
+                return;
+            }
+
             // === ADD ===
             if (command == "add")
             {
@@ -106,7 +143,6 @@ namespace NetworkService.ViewModel
                     TerminalInput = string.Empty;
                     return;
                 }
-
                 if (parts.Length < 5)
                 {
                     TerminalInput = string.Empty;
@@ -130,14 +166,9 @@ namespace NetworkService.ViewModel
                     double value = double.Parse(parts[parts.Length - 1]);
 
                     var type = entitiesViewModel.AvailableTypes
-                        .FirstOrDefault(t =>
-                            string.Equals(t.Name, typeName, StringComparison.OrdinalIgnoreCase));
+                        .FirstOrDefault(t => string.Equals(t.Name, typeName, StringComparison.OrdinalIgnoreCase));
 
-                    if (type == null)
-                    {
-                        TerminalInput = string.Empty;
-                        return;
-                    }
+                    if (type == null) { TerminalInput = string.Empty; return; }
 
                     entitiesViewModel.CurrentEntity = new Entity
                     {
@@ -197,12 +228,7 @@ namespace NetworkService.ViewModel
                     TerminalInput = string.Empty;
                     return;
                 }
-
-                if (parts.Length < 3)
-                {
-                    TerminalInput = string.Empty;
-                    return;
-                }
+                if (parts.Length < 3) { TerminalInput = string.Empty; return; }
 
                 string searchText = parts[1];
                 string mode = parts[2].ToLower();
@@ -225,7 +251,6 @@ namespace NetworkService.ViewModel
                     TerminalInput = string.Empty;
                     return;
                 }
-
                 ((ICommand)entitiesViewModel.ClearSearchCommand).Execute(null);
 
                 TerminalInput = string.Empty;
@@ -240,26 +265,95 @@ namespace NetworkService.ViewModel
                     TerminalInput = string.Empty;
                     return;
                 }
+                if (parts.Length < 2) { TerminalInput = string.Empty; return; }
 
-                if (parts.Length < 2)
+                string entityName = string.Join(" ", parts.Skip(1));
+                var entityToSelect = graphViewModel.Entities
+                    .FirstOrDefault(e => string.Equals(e.Name, entityName, StringComparison.OrdinalIgnoreCase));
+
+                if (entityToSelect != null)
+                    graphViewModel.SelectedEntity = entityToSelect;
+
+                TerminalInput = string.Empty;
+                return;
+            }
+
+            // === DISPLAY VIEW COMMANDS ===
+            if (CurrentViewModel == displayViewModel)
+            {
+                // place <entityId> <row> <col>
+                if (command == "place")
                 {
+                    if (parts.Length < 4) { TerminalInput = string.Empty; return; }
+                    try
+                    {
+                        int id = int.Parse(parts[1]);
+                        int row = int.Parse(parts[2]);
+                        int col = int.Parse(parts[3]);
+
+                        var entity = displayViewModel.Entities.FirstOrDefault(e => e.Id == id);
+                        var slot = displayViewModel.CanvasSlots.FirstOrDefault(s => s.Row == row && s.Col == col);
+
+                        if (entity != null && slot != null)
+                        {
+                            var oldSlot = displayViewModel.CanvasSlots.FirstOrDefault(s => s.CanvasEntity == entity);
+                            if (oldSlot != null)
+                                oldSlot.CanvasEntity = null;
+
+                            if (slot.CanvasEntity == null)
+                            {
+                                slot.CanvasEntity = entity;
+                                typeof(DisplayViewModel).GetMethod("RemoveFromGroups",
+                                    System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                                    .Invoke(displayViewModel, new object[] { entity });
+                            }
+                        }
+                    }
+                    catch { }
                     TerminalInput = string.Empty;
                     return;
                 }
 
-                string entityName = string.Join(" ", parts.Skip(1));
-
-                var entityToSelect = graphViewModel.Entities
-                    .FirstOrDefault(e =>
-                        string.Equals(e.Name, entityName, StringComparison.OrdinalIgnoreCase));
-
-                if (entityToSelect != null)
+                // remove <entityId>
+                if (command == "remove")
                 {
-                    graphViewModel.SelectedEntity = entityToSelect;
+                    if (parts.Length < 2) { TerminalInput = string.Empty; return; }
+                    try
+                    {
+                        int id = int.Parse(parts[1]);
+                        var entity = displayViewModel.Entities.FirstOrDefault(e => e.Id == id);
+                        var slot = displayViewModel.CanvasSlots.FirstOrDefault(s => s.CanvasEntity == entity);
+
+                        if (entity != null && slot != null)
+                        {
+                            slot.CanvasEntity = null;
+                            typeof(DisplayViewModel).GetMethod("AddToGroups",
+                                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                                .Invoke(displayViewModel, new object[] { entity });
+                        }
+                    }
+                    catch { }
+                    TerminalInput = string.Empty;
+                    return;
                 }
 
-                TerminalInput = string.Empty;
-                return;
+                // clearcanvas
+                if (command == "clearcanvas")
+                {
+                    foreach (var slot in displayViewModel.CanvasSlots)
+                    {
+                        if (slot.CanvasEntity != null)
+                        {
+                            var ent = slot.CanvasEntity;
+                            slot.CanvasEntity = null;
+                            typeof(DisplayViewModel).GetMethod("AddToGroups",
+                                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                                .Invoke(displayViewModel, new object[] { ent });
+                        }
+                    }
+                    TerminalInput = string.Empty;
+                    return;
+                }
             }
 
             // === NAVIGATION ===
