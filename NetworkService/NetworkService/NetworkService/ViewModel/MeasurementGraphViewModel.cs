@@ -52,6 +52,9 @@ namespace NetworkService.ViewModel
             set => SetProperty(ref _statusMessage, value);
         }
 
+        public MyICommand NextEntityCommand { get; private set; }
+        public MyICommand PreviousEntityCommand { get; private set; }
+
         public MeasurementGraphViewModel(ObservableCollection<Entity> sharedEntities)
         {
             Entities = sharedEntities;
@@ -65,6 +68,29 @@ namespace NetworkService.ViewModel
 
             if (Entities.Any())
                 SelectedEntity = Entities.First();
+
+            NextEntityCommand = new MyICommand(OnNextEntity);
+            PreviousEntityCommand = new MyICommand(OnPreviousEntity);
+        }
+
+        private void OnNextEntity()
+        {
+            if (Entities.Count == 0) return;
+            if (SelectedEntity == null) { SelectedEntity = Entities.First(); return; }
+
+            int index = Entities.IndexOf(SelectedEntity);
+            index = (index + 1) % Entities.Count; 
+            SelectedEntity = Entities[index];
+        }
+
+        private void OnPreviousEntity()
+        {
+            if (Entities.Count == 0) return;
+            if (SelectedEntity == null) { SelectedEntity = Entities.First(); return; }
+
+            int index = Entities.IndexOf(SelectedEntity);
+            index = (index - 1 + Entities.Count) % Entities.Count;  // wrap
+            SelectedEntity = Entities[index];
         }
 
         private void Entities_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)

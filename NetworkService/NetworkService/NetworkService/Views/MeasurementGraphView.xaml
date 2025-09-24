@@ -12,6 +12,16 @@
         <conv:CenterOffsetConverter x:Key="CenterOffsetConverter"/>
     </UserControl.Resources>
 
+    <UserControl.InputBindings>
+        <!-- Idemo na sledeći entitet -->
+        <KeyBinding Key="Right" Modifiers="Control"
+                Command="{Binding NextEntityCommand}"/>
+
+        <!-- Idemo na prethodni entitet -->
+        <KeyBinding Key="Left" Modifiers="Control"
+                Command="{Binding PreviousEntityCommand}"/>
+    </UserControl.InputBindings>
+
     <Grid Background="#EAF4FF" Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -32,6 +42,7 @@
                       ItemsSource="{Binding Entities}"
                       SelectedItem="{Binding SelectedEntity}"
                       DisplayMemberPath="Name"
+                      ToolTip="Select entity (Ctrl + → / Ctrl + ←)"
                       FontSize="14"
                       HorizontalAlignment="Center"/>
         </Border>

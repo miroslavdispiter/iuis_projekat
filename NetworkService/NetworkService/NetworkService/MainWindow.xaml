@@ -5,6 +5,19 @@
         xmlns:v="clr-namespace:NetworkService.Views"
         Title="Network Service" Width="900" Height="650">
 
+    <Window.InputBindings>
+        <!-- Global Navigation -->
+        <KeyBinding Key="D1" Modifiers="Control" 
+                Command="{Binding NavCommand}" 
+                CommandParameter="entities"/>
+        <KeyBinding Key="D2" Modifiers="Control" 
+                Command="{Binding NavCommand}" 
+                CommandParameter="display"/>
+        <KeyBinding Key="D3" Modifiers="Control" 
+                Command="{Binding NavCommand}" 
+                CommandParameter="graph"/>
+    </Window.InputBindings>
+
     <Window.DataContext>
         <vm:MainWindowViewModel/>
     </Window.DataContext>
@@ -33,14 +46,17 @@
                         VerticalAlignment="Center" 
                         Margin="10,0,0,0">
                 <Button Content="Network Entities"
+                        ToolTip="Go to Entities View (Ctrl+1)"
                         Command="{Binding NavCommand}" 
                         CommandParameter="entities"
                         Margin="0,0,10,0"/>
                 <Button Content="Network Display"
+                        ToolTip="Go to Display View (Ctrl+2)"
                         Command="{Binding NavCommand}" 
                         CommandParameter="display"
                         Margin="0,0,10,0"/>
                 <Button Content="Measurement Graph"
+                        ToolTip="Go to Measurement Graph View (Ctrl+3)"
                         Command="{Binding NavCommand}" 
                         CommandParameter="graph"/>
             </StackPanel>

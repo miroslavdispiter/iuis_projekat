@@ -7,6 +7,20 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
 
+    <UserControl.InputBindings>
+        <KeyBinding Key="N" Modifiers="Control" 
+                Command="{Binding AddCommand}"/>
+
+        <KeyBinding Key="D" Modifiers="Control" 
+                    Command="{Binding DeleteCommand}"/>
+
+        <KeyBinding Key="S" Modifiers="Control" 
+                    Command="{Binding ApplySearchCommand}"/>
+
+        <KeyBinding Key="E" Modifiers="Control" 
+                    Command="{Binding ClearSearchCommand}"/>
+    </UserControl.InputBindings>
+
     <Grid Background="#EAF4FF" 
           Margin="10">
         <Grid.ColumnDefinitions>
@@ -149,6 +163,7 @@
                     <!-- Add Button -->
                     <Button Content="Add" 
                             FontFamily="Consolas"
+                            ToolTip="Add New Entity (Ctrl+N)"
                             Command="{Binding AddCommand}" 
                             Width="100" 
                             Height="30"
@@ -196,12 +211,14 @@
                                 Margin="3,10,0,0">
                         <Button Content="Apply"
                                 FontFamily="Consolas"
+                                ToolTip="Apply Search (Ctrl+S)"
                                 Command="{Binding ApplySearchCommand}" 
                                 Width="97.5"
                                 Height="30"
                                 Margin="0,0,5,0"/>
                         <Button Content="Clear" 
                                 FontFamily="Consolas"
+                                ToolTip="Clear Search (Ctrl+E)"
                                 Command="{Binding ClearSearchCommand}" 
                                 Width="97.5"
                                 Height="30"/>
@@ -272,6 +289,7 @@
                     Margin="10"
                     Content="Delete Selected" 
                     FontFamily="Consolas"
+                    ToolTip="Delete Entity (Ctrl+X)"
                     Command="{Binding DeleteCommand}" 
                     Width="120"
                     Height="30" 
