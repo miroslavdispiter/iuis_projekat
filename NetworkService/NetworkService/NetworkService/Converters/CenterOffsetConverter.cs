@@ -14,7 +14,7 @@ namespace NetworkService.Converters
         {
             double original = (double)value;
             double size = double.Parse(parameter.ToString());
-            return original - size / 2;   // centriraj krug oko tacke
+            return original - size / 2;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

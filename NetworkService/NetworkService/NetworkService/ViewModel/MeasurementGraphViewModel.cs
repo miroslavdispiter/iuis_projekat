@@ -116,7 +116,7 @@ namespace NetworkService.ViewModel
 
             var lines = File.ReadAllLines(logFile)
                 .Where(l => l.Contains($"Entity_{SelectedEntity.Id}"))
-                .Reverse().Take(10).Reverse()
+                .Reverse().Take(5).Reverse()   // >>> poslednjih 5 merenja
                 .ToList();
 
             if (lines.Count == 0)
@@ -146,15 +146,29 @@ namespace NetworkService.ViewModel
             double maxValue = Math.Max(10, parsedLines.Max(x => x.Value));
             double xStep = parsedLines.Count > 1 ? 500.0 / (parsedLines.Count - 1) : 500.0;
 
+            double graphWidth = 600;
+            double leftMargin = 50;
+            double rightMargin = 50;
+            double usableWidth = graphWidth - leftMargin - rightMargin;
+            int sections = parsedLines.Count;
+            double sectionWidth = usableWidth / sections;
+
             int index = 0;
             foreach (var item in parsedLines)
             {
+                bool isValid = item.Value >= 1 && item.Value <= 5;
+
+                double x = leftMargin + (index * sectionWidth) + sectionWidth / 2;
+                double y = 250 - (item.Value / maxValue) * 200;
+
                 var point = new GraphPoint
                 {
                     Timestamp = item.Timestamp,
                     Value = item.Value,
-                    RelativeX = 50 + index * xStep,
-                    RelativeY = 250 - (item.Value / maxValue) * 200
+                    RelativeX = x,
+                    RelativeY = y,
+                    Color = isValid ? Brushes.Blue : Brushes.Red,
+                    Label = item.Timestamp.ToString("HH:mm")
                 };
 
                 Measurements.Add(point);
