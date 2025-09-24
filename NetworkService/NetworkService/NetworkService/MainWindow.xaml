@@ -16,6 +16,8 @@
         <KeyBinding Key="D3" Modifiers="Control" 
                 Command="{Binding NavCommand}" 
                 CommandParameter="graph"/>
+        <KeyBinding Key="Z" Modifiers="Control"
+                Command="{Binding UndoCommand}" />
     </Window.InputBindings>
 
     <Window.DataContext>

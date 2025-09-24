@@ -72,6 +72,9 @@
     <Compile Include="Model\GraphPoint.cs" />
     <Compile Include="Model\MeasurementPoint.cs" />
     <Compile Include="Helpers\MyICommand.cs" />
+    <Compile Include="Undo\AddEntityUndoCommand.cs" />
+    <Compile Include="Undo\DeleteEntityUndoCommand.cs" />
+    <Compile Include="Undo\UndoManager.cs" />
     <Compile Include="ViewModel\DisplayViewModel.cs" />
     <Compile Include="ViewModel\EntitiesViewModel.cs" />
     <Compile Include="ViewModel\MainWindowViewModel.cs" />

@@ -88,13 +88,17 @@ namespace NetworkService.ViewModel
                     return;
                 }
 
-                Entities.Add(new Entity
+                var addedEntity = new Entity
                 {
                     Id = CurrentEntity.Id,
                     Name = CurrentEntity.Name,
                     Type = CurrentEntity.Type,
                     Value = CurrentEntity.Value
-                });
+                };
+
+                Entities.Add(addedEntity);
+
+                Undo.UndoManager.Register(new Undo.AddEntityUndoCommand(Entities, addedEntity, this));
 
                 RefreshFilter();
                 CurrentEntity = new Entity();
@@ -109,7 +113,9 @@ namespace NetworkService.ViewModel
 
                 if (result == MessageBoxResult.Yes)
                 {
-                    Entities.Remove(SelectedEntity);
+                    var deletedEntity = SelectedEntity;
+                    Entities.Remove(deletedEntity);
+                    Undo.UndoManager.Register(new Undo.DeleteEntityUndoCommand(Entities, deletedEntity, this));
                     RefreshFilter();
                 }
             }
@@ -143,7 +149,7 @@ namespace NetworkService.ViewModel
             RefreshFilter();
         }
 
-        private void RefreshFilter()
+        public void RefreshFilter()
         {
             FilteredEntities.Clear();
             foreach (var e in Entities)

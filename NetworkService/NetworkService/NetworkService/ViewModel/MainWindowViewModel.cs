@@ -20,6 +20,7 @@ namespace NetworkService.ViewModel
         private BindableBase _currentViewModel;
         public MyICommand<string> NavCommand { get; private set; }
         public ObservableCollection<Entity> Entities { get; set; }
+        public MyICommand UndoCommand { get; private set; }
 
         private EntitiesViewModel entitiesViewModel;
         private DisplayViewModel displayViewModel;
@@ -61,6 +62,7 @@ namespace NetworkService.ViewModel
 
             NavCommand = new MyICommand<string>(OnNav);
             TerminalEnterCommand = new MyICommand(OnTerminalEnter);
+            UndoCommand = new MyICommand(OnUndo);
             CurrentViewModel = entitiesViewModel;
 
             CreateListener();
@@ -80,6 +82,11 @@ namespace NetworkService.ViewModel
                     CurrentViewModel = graphViewModel;
                     break;
             }
+        }
+
+        private void OnUndo()
+        {
+            Undo.UndoManager.Undo();
         }
 
         private void OnTerminalEnter()
