@@ -11,6 +11,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace NetworkService.ViewModel
 {
@@ -37,6 +38,8 @@ namespace NetworkService.ViewModel
             set => SetProperty(ref _currentViewModel, value);
         }
 
+        public MyICommand TerminalEnterCommand { get; private set; }
+
         public MainWindowViewModel()
         {
             var solarType = new EntityType { Name = "Solar Panel", ImagePath = "/Images/solar.png" };
@@ -57,6 +60,7 @@ namespace NetworkService.ViewModel
             Entities.CollectionChanged += Entities_CollectionChanged;
 
             NavCommand = new MyICommand<string>(OnNav);
+            TerminalEnterCommand = new MyICommand(OnTerminalEnter);
             CurrentViewModel = entitiesViewModel;
 
             CreateListener();
@@ -76,6 +80,130 @@ namespace NetworkService.ViewModel
                     CurrentViewModel = graphViewModel;
                     break;
             }
+        }
+
+        private void OnTerminalEnter()
+        {
+            if (string.IsNullOrWhiteSpace(TerminalInput))
+                return;
+
+            string input = TerminalInput.Trim();
+            string[] parts = input.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+            if (parts.Length == 0)
+            {
+                TerminalInput = string.Empty;
+                return;
+            }
+
+            string command = parts[0].ToLower();
+
+            if (command == "add")
+            {
+                // Očekujemo: add [Id] [Name] [Type...] [Value]
+                if (parts.Length < 5)
+                {
+                    TerminalInput = string.Empty;
+                    return;
+                }
+
+                try
+                {
+                    int id = int.Parse(parts[1]);
+                    string name = parts[2];
+
+                    string typeName = "";
+                    for (int i = 3; i < parts.Length - 1; i++)
+                    {
+                        if (i > 3) typeName += " ";
+                        typeName += parts[i];
+                    }
+
+                    typeName = typeName.Replace("\"", "");
+
+                    double value = double.Parse(parts[parts.Length - 1]);
+
+                    var type = entitiesViewModel.AvailableTypes
+                        .FirstOrDefault(t =>
+                            string.Equals(t.Name, typeName, StringComparison.OrdinalIgnoreCase));
+
+                    if (type == null)
+                    {
+                        TerminalInput = string.Empty;
+                        return;
+                    }
+
+                    entitiesViewModel.CurrentEntity = new Entity
+                    {
+                        Id = id,
+                        Name = name,
+                        Type = type,
+                        Value = value
+                    };
+
+                    ((ICommand)entitiesViewModel.AddCommand).Execute(null);
+                }
+                catch
+                {
+                    // Ako parsiranje ne uspe → ignoriši
+                }
+
+                TerminalInput = string.Empty;
+                return;
+            }
+
+            if (command == "delete")
+            {
+                // Očekujemo: delete [Id]
+                if (parts.Length < 2)
+                {
+                    TerminalInput = string.Empty;
+                    return;
+                }
+
+                try
+                {
+                    int id = int.Parse(parts[1]);
+
+                    var entityToDelete = entitiesViewModel.Entities
+                        .FirstOrDefault(e => e.Id == id);
+
+                    if (entityToDelete != null)
+                    {
+                        entitiesViewModel.SelectedEntity = entityToDelete;
+                        ((ICommand)entitiesViewModel.DeleteCommand).Execute(null);
+                    }
+                }
+                catch
+                {
+                    // Ako parsiranje ne uspe – ništa
+                }
+
+                TerminalInput = string.Empty;
+                return;
+            }
+
+            if (command == "nav")
+            {
+                if (parts.Length > 1)
+                {
+                    string target = parts[1].ToLower();
+                    switch (target)
+                    {
+                        case "entities":
+                            CurrentViewModel = entitiesViewModel;
+                            break;
+                        case "display":
+                            CurrentViewModel = displayViewModel;
+                            break;
+                        case "graph":
+                            CurrentViewModel = graphViewModel;
+                            break;
+                    }
+                }
+            }
+
+            TerminalInput = string.Empty;
         }
 
         private void CreateListener()

@@ -102,16 +102,20 @@
                 <!-- INPUT POLJE TERMINALA -->
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <TextBox Text="{Binding TerminalInput, UpdateSourceTrigger=PropertyChanged}"
-                     AcceptsReturn="True"
-                     Foreground="LightGreen"
-                     Background="Black"
-                     BorderThickness="0"
-                     FontFamily="Consolas"
-                     FontSize="14"
-                     TextWrapping="Wrap"
-                     Padding="10"
-                     Margin="0"
-                     VerticalScrollBarVisibility="Hidden"/>
+                             AcceptsReturn="False"
+                             Foreground="LightGreen"
+                             Background="Black"
+                             BorderThickness="0"
+                             FontFamily="Consolas"
+                             FontSize="14"
+                             TextWrapping="Wrap"
+                             Padding="10"
+                             Margin="0">
+                        <TextBox.InputBindings>
+                            <KeyBinding Key="Enter"
+                                    Command="{Binding TerminalEnterCommand}" />
+                        </TextBox.InputBindings>
+                    </TextBox>
                 </ScrollViewer>
             </DockPanel>
         </Border>
