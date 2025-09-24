@@ -43,6 +43,8 @@ namespace NetworkService.ViewModel
             set { _graphPoints = value; OnPropertyChanged(nameof(GraphPoints)); }
         }
 
+        public ObservableCollection<double> SectionLines { get; set; }
+
         private string _statusMessage;
         public string StatusMessage
         {
@@ -54,9 +56,9 @@ namespace NetworkService.ViewModel
         {
             Entities = sharedEntities;
             Measurements = new ObservableCollection<GraphPoint>();
+            SectionLines = new ObservableCollection<double>();
             StatusMessage = "Measurement Graph initialized.";
 
-            // pratimo promene u kolekciji i u entitetima
             Entities.CollectionChanged += Entities_CollectionChanged;
             foreach (var e in Entities)
                 e.PropertyChanged += Entity_PropertyChanged;
@@ -87,7 +89,7 @@ namespace NetworkService.ViewModel
                 {
                     System.Windows.Application.Current.Dispatcher.InvokeAsync(async () =>
                     {
-                        await Task.Delay(100);
+                        await Task.Delay(100); // mali delay da se sakupe upisi u log
                         LoadMeasurementsForEntity();
                     });
                 }
@@ -96,6 +98,7 @@ namespace NetworkService.ViewModel
 
         private void LoadMeasurementsForEntity()
         {
+            // thread safe
             if (!System.Windows.Application.Current.Dispatcher.CheckAccess())
             {
                 System.Windows.Application.Current.Dispatcher.Invoke(LoadMeasurementsForEntity);
@@ -103,6 +106,7 @@ namespace NetworkService.ViewModel
             }
 
             Measurements.Clear();
+            SectionLines.Clear();
             GraphPoints = new PointCollection();
 
             if (SelectedEntity == null) return;
@@ -116,7 +120,7 @@ namespace NetworkService.ViewModel
 
             var lines = File.ReadAllLines(logFile)
                 .Where(l => l.Contains($"Entity_{SelectedEntity.Id}"))
-                .Reverse().Take(5).Reverse()   // >>> poslednjih 5 merenja
+                .Reverse().Take(5).Reverse()
                 .ToList();
 
             if (lines.Count == 0)
@@ -143,22 +147,32 @@ namespace NetworkService.ViewModel
                 return;
             }
 
+            // max vrednost -> skaliranje po Y osi
             double maxValue = Math.Max(10, parsedLines.Max(x => x.Value));
-            double xStep = parsedLines.Count > 1 ? 500.0 / (parsedLines.Count - 1) : 500.0;
 
             double graphWidth = 600;
             double leftMargin = 50;
             double rightMargin = 50;
             double usableWidth = graphWidth - leftMargin - rightMargin;
-            int sections = parsedLines.Count;
-            double sectionWidth = usableWidth / sections;
 
+            // === ISPRAVLJENO: broj intervala = broj tačaka ===
+            int sectionCount = parsedLines.Count;
+            double sectionWidth = usableWidth / sectionCount;
+
+            SectionLines.Clear();
+            for (int i = 0; i <= sectionCount; i++)
+            {
+                double xLine = leftMargin + i * sectionWidth;
+                SectionLines.Add(xLine);
+            }
+
+            // dodajemo tačke
             int index = 0;
             foreach (var item in parsedLines)
             {
                 bool isValid = item.Value >= 1 && item.Value <= 5;
 
-                double x = leftMargin + (index * sectionWidth) + sectionWidth / 2;
+                double x = leftMargin + (index + 0.5) * sectionWidth;  // tačno u sredini intervala
                 double y = 250 - (item.Value / maxValue) * 200;
 
                 var point = new GraphPoint

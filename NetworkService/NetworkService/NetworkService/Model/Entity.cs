@@ -76,5 +76,10 @@ namespace NetworkService.Model
             if (Value < 0)
                 ValidationErrors[nameof(Value)] = "Value must be positive.";
         }
+
+        public override string ToString()
+        {
+            return Name;
+        }
     }
 }

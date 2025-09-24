@@ -12,104 +12,113 @@
         <conv:CenterOffsetConverter x:Key="CenterOffsetConverter"/>
     </UserControl.Resources>
 
-    <Grid Background="#EAF4FF" 
-          Margin="10">
+    <Grid Background="#EAF4FF" Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- Odabir entiteta -->
-        <StackPanel Orientation="Horizontal" 
-                    Margin="10">
-            <TextBlock Text="Select Entity:" 
-                       FontWeight="Bold" 
-                       VerticalAlignment="Center" 
-                       Margin="0,0,5,0"/>
-            <ComboBox Width="200"
+        <!-- SELECT ENTITY -->
+        <Border Grid.Row="0"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Padding="15"
+                Margin="0,10,0,0"
+                Background="White"
+                CornerRadius="6"
+                BorderThickness="1"
+                BorderBrush="#DDD">
+            <ComboBox Width="220"
                       ItemsSource="{Binding Entities}"
                       SelectedItem="{Binding SelectedEntity}"
-                      DisplayMemberPath="Name"/>
-        </StackPanel>
+                      DisplayMemberPath="Name"
+                      FontSize="14"
+                      HorizontalAlignment="Center"/>
+        </Border>
 
-        <!-- GLAVNI GRAF -->
-        <Canvas Grid.Row="1" 
-                Width="650" 
-                Height="300" 
-                Background="#FAFAFA" 
-                Margin="10">
+        <!-- MAIN GRAPH -->
+        <Border Grid.Row="1"
+                BorderBrush="#0066cc"
+                BorderThickness="3"
+                CornerRadius="8"
+                Margin="10"
+                Background="White">
 
-            <!-- Horizontalna linija (X osa) -->
-            <Line X1="0" Y1="250"
-                  X2="650" Y2="250"
-                  Stroke="Gray" StrokeThickness="1"/>
+            <Canvas Width="650" 
+                    Height="300" 
+                    Background="#FAFAFA">
 
-            <!-- Vertikalne linije - po broju merenja +1 -->
-            <ItemsControl ItemsSource="{Binding Measurements}">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <Canvas/>
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Line X1="{Binding RelativeX, Converter={StaticResource CenterOffsetConverter}, ConverterParameter=0}" 
-                      X2="{Binding RelativeX, Converter={StaticResource CenterOffsetConverter}, ConverterParameter=0}" 
-                      Y1="0"
-                      Y2="300"
-                      Stroke="LightGray"
-                      StrokeThickness="1"/>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
+                <!-- Horizontalna linija (X osa) -->
+                <Line X1="0" Y1="250"
+                      X2="650" Y2="250"
+                      Stroke="Gray" StrokeThickness="1"/>
 
-            <!-- Polyline koja spaja tacke -->
-            <Polyline Stroke="DarkBlue"
-              StrokeThickness="2"
-              Points="{Binding GraphPoints}"/>
+                <!-- Vertikalne linije -->
+                <ItemsControl ItemsSource="{Binding SectionLines}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <Canvas/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Line X1="{Binding}" X2="{Binding}" 
+                                  Y1="0" Y2="250"
+                                  Stroke="LightGray" StrokeThickness="1"/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
 
-            <!-- Kuglice + vrednosti + vreme ispod -->
-            <ItemsControl ItemsSource="{Binding Measurements}">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <Canvas/>
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Canvas>
-                            <!-- Krug -->
-                            <Ellipse Width="20"
-                             Height="20"
-                             Fill="{Binding Color}"
-                             Stroke="Black"
-                             StrokeThickness="2"
-                             Canvas.Left="{Binding RelativeX, Converter={StaticResource CenterOffsetConverter}, ConverterParameter=20}"
-                             Canvas.Top="{Binding RelativeY, Converter={StaticResource CenterOffsetConverter}, ConverterParameter=20}"/>
+                <!-- Polyline koja spaja tacke -->
+                <Polyline Stroke="DarkBlue"
+                          StrokeThickness="2"
+                          Points="{Binding GraphPoints}"/>
 
-                            <!-- Vrednost unutar kruga -->
-                            <TextBlock Text="{Binding Value}"
-                               FontWeight="Bold"
-                               FontSize="10"
-                               Foreground="White"
-                               TextAlignment="Center"
-                               Width="20"
-                               Height="20"
-                               Canvas.Left="{Binding RelativeX, Converter={StaticResource CenterOffsetConverter}, ConverterParameter=20}"
-                               Canvas.Top="{Binding RelativeY, Converter={StaticResource CenterOffsetConverter}, ConverterParameter=20}"/>
+                <!-- Kuglice + vrednosti + vreme ispod -->
+                <ItemsControl ItemsSource="{Binding Measurements}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <Canvas/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Canvas>
+                                <!-- Krug -->
+                                <Ellipse Width="28"
+                         Height="28"
+                         Fill="{Binding Color}"
+                         Stroke="DarkBlue"
+                                    StrokeThickness="2"
+                         Canvas.Left="{Binding RelativeX, Converter={StaticResource CenterOffsetConverter}, ConverterParameter=28}"
+                         Canvas.Top="{Binding RelativeY, Converter={StaticResource CenterOffsetConverter}, ConverterParameter=28}"/>
 
-                            <!-- Vreme ispod (na X osi) -->
-                            <TextBlock Text="{Binding Label}"
-                               FontSize="10"
-                               Foreground="Black"
-                               TextAlignment="Center"
-                               Width="50"
-                               Canvas.Left="{Binding RelativeX, Converter={StaticResource CenterOffsetConverter}, ConverterParameter=50}"
-                               Canvas.Top="260"/>
-                        </Canvas>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </Canvas>
+                                    <!-- Vrednost unutar kruga -->
+                                    <TextBlock Text="{Binding Value}"
+                           FontWeight="Bold"
+                           FontSize="14"
+                           Foreground="White"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           TextAlignment="Center"
+                           Width="28"
+                           Height="28"
+                           Canvas.Left="{Binding RelativeX, Converter={StaticResource CenterOffsetConverter}, ConverterParameter=28}"
+                           Canvas.Top="{Binding RelativeY, Converter={StaticResource CenterOffsetConverter}, ConverterParameter=28}"/>
+
+                                    <!-- Vreme ispod (na X osi) -->
+                                    <TextBlock Text="{Binding Label}"
+                           FontSize="10"
+                           Foreground="Black"
+                           TextAlignment="Center"
+                           Width="50"
+                           Canvas.Left="{Binding RelativeX, Converter={StaticResource CenterOffsetConverter}, ConverterParameter=50}"
+                           Canvas.Top="270"/>
+                            </Canvas>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </Canvas>
+        </Border>
     </Grid>
 </UserControl>
