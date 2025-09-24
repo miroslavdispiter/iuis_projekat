@@ -52,23 +52,7 @@ namespace NetworkService.ViewModel
 
             RefreshGroups();
 
-            Entities.CollectionChanged += (s, e) =>
-            {
-                RefreshGroups();
-
-                // LINIJE: brisanje ako entitet obrisan
-                if (e.Action == NotifyCollectionChangedAction.Remove)
-                {
-                    foreach (Entity removed in e.OldItems)
-                    {
-                        for (int i = Linije.Count - 1; i >= 0; i--)
-                        {
-                            if (Linije[i].SrcId == removed.Id || Linije[i].DstId == removed.Id)
-                                Linije.RemoveAt(i);
-                        }
-                    }
-                }
-            };
+            Entities.CollectionChanged += OnEntitiesCollectionChanged;
 
             DragOverCommand = new MyICommand<object>(OnDragOver);
             DropCommand = new MyICommand<object>(OnDrop);
@@ -259,6 +243,33 @@ namespace NetworkService.ViewModel
                 EntityGroups[0].Entities.Add(e);
             else if (e.Type.Name == "Wind Generator" && !EntityGroups[1].Entities.Contains(e))
                 EntityGroups[1].Entities.Add(e);
+        }
+
+        private void OnEntitiesCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            RefreshGroups();
+
+            if (e.Action == NotifyCollectionChangedAction.Remove)
+            {
+                foreach (Entity removed in e.OldItems)
+                {
+                    // obriši sve linije povezane sa tim entitetom
+                    for (int i = Linije.Count - 1; i >= 0; i--)
+                    {
+                        if (Linije[i].SrcId == removed.Id || Linije[i].DstId == removed.Id)
+                            Linije.RemoveAt(i);
+                    }
+
+                    // obriši entitet sa canvas slotova
+                    foreach (var slot in CanvasSlots)
+                    {
+                        if (slot.CanvasEntity?.Id == removed.Id)
+                        {
+                            slot.CanvasEntity = null;
+                        }
+                    }
+                }
+            }
         }
     }
 }
